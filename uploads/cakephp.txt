@@ -1,0 +1,142 @@
+cakePHPpoznamky 
+
+app.php : konfigurak
+sem sa zadavaju parametre databazy
+______________________________________________
+Lekcia 8 : struktura suborov cakePHP projektu:
+
+.github - github subory...
+
+bin - ???
+
+config - configuration
+app.php - nastavenia databazy..
+routes.php - router
+routes->connect(display,home) home zobrazi default stranku cakePHP
+
+logs - error logy
+
+plugins - pluginy
+
+src - models, views, controllers,...
+	     -> model
+controller controls
+	     -> view
+template - css subory
+
+vendor - je tu composer
+ten vytvara cakephp projekt
+
+webroot- subory pre stranku
+css,obrazky,javascript
+
+_____________________________________
+Lekcia 9: 
+vytvorenie tabulky pomocou /bin suboru
+
+presunut sa do cakeproject/bin zlozky v konzoli,
+com : cake migrations create table_name
+vytvori migrations subor v /config/migrations/2019...._users.php
+
+v tomto subore vytvorime tabulku :
+
+$table = $this->table('table_name')
+
+$table
+	->addColumn('col_name','datetype',[
+		'default' => 'defaultna_hodnota',
+		'limit' => rozsah(int)
+		'null'	=> boolean (povolenie null hodnoty v stlpci)		
+	])
+	->create();
+
+datetypy - string,boolean,timestamp,datetime,integer,email...
+
+phinx obsahuje tieto funkcie:
+	->createTable
+	->renameTable
+	->addColumn
+	->renameColumn
+	->addIndex
+	->addForeignKey
+a metody
+	public function up(){} // migrate up
+	public function down(){} // migrate down
+
+spustime :
+	cake migrations migrate
+vytvori tabulku..
+_____________________________________
+Lekcia 10:
+com : cake bake all table_name
+vytvori controller v /src/Table_nameController,
+src/model/table/Table_nameTable,
+src/Template/Table_name DIR
+	     |->add.ctp
+	     |-->edit.ctp
+	     |--->index.ctp
+	     |---->view.ctp
+
+na URL stranky :
+http://mycakephpapp.local/table_name sa vytvori stranka pre tabulku...
+obsahuje tiez akciu new table_name pre novy zaznam
+__________________________________________
+Lekcia 11: spatna vazba,...
+__________________________________________
+Lekcia 12: Admin theme
+genterella-master stiahnute z:
+https://github.com/ColorlibHQ/gentelella/tree/master
+__________________________________________
+Lekcia 13: genterella introduction
+genterella-master DIR
+	|->build
+	|-->docs
+	|--->production - vsetky html subory
+	|---->src
+	 ----->vendors
+
+build,production,vendors->prekopirovat do cakphpproject/webroot
+
+->cakeproject/config/routes.php - router, obsahuje vsetky podstranky
+ako aj uvodnu stranku, 
+$routes->connect('/',['controller'=>'Pages', 'action'=>'display','home']);
+defaultne nastavenie na prednastavenu domovsku stranku cakeu,
+ktora je v src/Template/Pages/home.ctp - ctp = cake extension
+
+po odstreneni vsetkeho v home.ctp ostane defaultny navbar, ktory
+je v src/Template/Layout/rss/default.ctp
+
+Lekcia 14 : genterella introduction part2
+do src/Template/Element vytvorime
+subory content.ctp,footer.ctp,sidebar.ctp,top_bar.ctp
+webroot zlozku ma dostat prikaz
+$this->request->webroot - mne ale nefungje
+
+$this->Html->css('cssstyle.css') ->nacitanie csska
+
+src/Template/Element/subor.ctp
+obsah subor.ctp nacitame :
+echo $this->element('subor'); v 
+funguje v:
+src/Template/Layout/default.ctp
+
+UserInfoController -> UserInfosController 
+nazov controllera v plurali prida funkcie cakephpu
+
+_______________________________________________-
+Lekcia 16: cakebake 2
+po vytvoreni tabulky table_name zadame len cake bake all table_name,
+vsetko sa vytvori ..
+
+Lekcia 19: 
+ak chceme vytvorit tabulky so vztahom
+vytvorime tab1,tab2 v phpmyadmine
+dalej ak tab2 obsahuje FK tab1_id
+
+spustime po jednom :
+cake bake Model tab1
+cake bake Model tab2
+hotovo
+
+
+
