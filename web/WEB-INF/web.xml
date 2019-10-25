@@ -13,6 +13,16 @@
         <url-pattern>/upload</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>FileDownloadServlet</servlet-name>
+        <servlet-class>main.FileDownloadServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>FileDownloadServlet</servlet-name>
+        <url-pattern>/download/*</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>
             30
@@ -23,23 +33,24 @@
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
-  <!--  <servlet>
+    <servlet>
         <servlet-name>TestServlet</servlet-name>
-        <servlet-class></servlet-class>
         <jsp-file>/files.jsp</jsp-file>
     </servlet>
-    &lt;!&ndash;mapping&ndash;&gt;
+    <!--mapping-->
     <servlet-mapping>
         <servlet-name>TestServlet</servlet-name>
-        <url-pattern>/files</url-pattern>
-    </servlet-mapping>-->
+        <url-pattern>/files.jsp</url-pattern>
+    </servlet-mapping>
 
     <servlet>
-        <servlet-name>FileList</servlet-name>
-        <servlet-class>main.FileListHandler</servlet-class>
+        <servlet-name>RegenerateKeys</servlet-name>
+        <jsp-file>/key_manager.jsp</jsp-file>
     </servlet>
+    <!--mapping-->
     <servlet-mapping>
-        <servlet-name>FileList</servlet-name>
-        <url-pattern>/files</url-pattern>
+        <servlet-name>RegenerateKeys</servlet-name>
+        <url-pattern>/key_manager.jsp</url-pattern>
     </servlet-mapping>
+
 </web-app>

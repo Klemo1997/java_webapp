@@ -83,6 +83,10 @@ public class FileUploadHandler extends HttpServlet
                     out.write(buffer, 0, length);
                 }
 
+                if (!temp.delete()) {
+                    // Exception file delete failed
+                }
+
                 in.close();
                 out.flush();
 
