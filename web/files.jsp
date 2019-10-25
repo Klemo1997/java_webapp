@@ -52,7 +52,7 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
                 <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
-                    <li class="list-group-item"><%=entry.getKey()%> <a href="download/<%=entry.getKey()%>"><i class="far fa-folder"></i></a></li>
+                    <li class="list-group-item"><div class="to-left"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i></div> <%=entry.getKey()%> <a href="download/<%=entry.getKey()%>"><i class="fas fa-download"></i></a></li>
                 <% } %>
         </ul>
     </div>
@@ -63,6 +63,20 @@
         padding: 0;
         margin-top: 50px;
     }
+    .fas.fa-lock-open {
+        margin-right: 10px;
+        margin-left: 10px;
+        font-size: 20px;
+    }
+
+    .to-left {
+        float: left;
+    }
+
+    .list-group a {
+        float: right;
+        display: inline-block;
+    }
 
 </style>
 
@@ -71,8 +85,10 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
     $('.list-group-item a').on('click', function () {
-        var decryptfile = confirm('Chcete súbor dešifrovať ? (Ak nie stlačte cancel pre stiahnutie šifrovaného súboru)');
-        if (decryptfile) {
+
+        var checkbox_checked = $(this).siblings('.to-left').find('input').is(':checked');
+
+        if (checkbox_checked) {
             window.location.replace($(this).attr('href') + '?decrypt=true');
         }
     });
