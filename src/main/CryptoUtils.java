@@ -1,13 +1,16 @@
-package main;
-
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class CryptoUtils
 {
@@ -30,9 +33,18 @@ public class CryptoUtils
             Key secretKey = new SecretKeySpec(key.getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(cipherMode, secretKey);
-            FileInputStream inputStream = new FileInputStream(inputFile);
+
+            FileInputStream inputStream = new FileInputStream(inputFile); //
             byte[] inputBytes = new byte[(int)inputFile.length()];
 
+            RsaKeyGenerator rsa= new RsaKeyGenerator();
+            //key pair of keys public and private for file
+            KeyPair kluce = rsa.getKeyPair(inputFile.getName());
+
+            //byte to string 
+	        byte[] cipherByte = cipher.doFinal(key.getBytes(UTF_8));
+	        
+            
             // Output stream
             inputStream.read(inputBytes);
 
@@ -42,6 +54,7 @@ public class CryptoUtils
             }
 
             if (cipherMode == Cipher.DECRYPT_MODE) {
+                String cipherString = rsa.decrypt(Base64.getEncoder().encodeToString(cipherByte), kluce.getPrivate());
                 inputBytes = Arrays.copyOfRange(inputBytes, 0, inputBytes.length - 32);
             }
             byte[] outputBytes = cipher.doFinal(inputBytes);
@@ -50,11 +63,14 @@ public class CryptoUtils
 //            outputStream.write(outputBytes);
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             output.write(outputBytes);
+            
             if (cipherMode == Cipher.ENCRYPT_MODE) {
+                String cipherString = rsa.encrypt(Base64.getEncoder().encodeToString(cipherByte), kluce.getPublic());
                 output.write(getMac(outputStream, outputBytes ,key));
             }
 
             outputStream.write(output.toByteArray());
+          
             inputStream.close();
             outputStream.close();
         } catch(
@@ -69,6 +85,8 @@ public class CryptoUtils
         }
     }
 
+    
+    
     public static byte[] getMac(FileOutputStream encrypted, byte[] outputBytes ,String key) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
 
         //Append last 16 bytes of mac
