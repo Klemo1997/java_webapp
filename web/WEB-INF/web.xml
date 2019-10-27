@@ -44,13 +44,23 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>RegenerateKeys</servlet-name>
+        <servlet-name>KeyManager</servlet-name>
         <jsp-file>/key_manager.jsp</jsp-file>
     </servlet>
     <!--mapping-->
     <servlet-mapping>
-        <servlet-name>RegenerateKeys</servlet-name>
+        <servlet-name>KeyManager</servlet-name>
         <url-pattern>/key_manager.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>KeyGenerator</servlet-name>
+        <servlet-class>main.KeysRegenerateServlet</servlet-class>
+    </servlet>
+    <!--mapping-->
+    <servlet-mapping>
+        <servlet-name>KeyGenerator</servlet-name>
+        <url-pattern>/keys_regenerate</url-pattern>
     </servlet-mapping>
 
 </web-app>

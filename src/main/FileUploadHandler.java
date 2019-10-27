@@ -29,7 +29,8 @@ public class FileUploadHandler extends HttpServlet
 
                 File
                 temp = null,
-                encrypted = null;
+                encrypted = null,
+                keyFile = null;
 
                 String
                 key = null,
@@ -39,10 +40,17 @@ public class FileUploadHandler extends HttpServlet
                 {
                     if(!item.isFormField())
                     {
-                        String name = new File(item.getName()).getName();
-                        temp = new File(UPLOADDIRECTORY + File.separator + name);
-                        item.write(temp);
-                        encrypted = new File(UPLOADDIRECTORY + File.separator + name + ".enc");
+                        if (item.getFieldName().equals("keyFile")) {
+                            String name = new File(item.getName()).getName();
+                            keyFile = new File(UPLOADDIRECTORY + File.separator + "inputKey");
+                            item.write(keyFile);
+                        } else {
+                            String name = new File(item.getName()).getName();
+                            temp = new File(UPLOADDIRECTORY + File.separator + name);
+                            item.write(temp);
+                            encrypted = new File(UPLOADDIRECTORY + File.separator + name + ".enc");
+                        }
+
                     }
                     else
                     {
@@ -61,9 +69,9 @@ public class FileUploadHandler extends HttpServlet
                 //File uploaded successfully
 
                 if (mode.equals("enc")) {
-                    CryptoUtils.encrypt(key,temp,encrypted);
+                    CryptoUtils.encrypt(keyFile,temp,encrypted);
                 } else if (mode.equals("dec")) {
-                    CryptoUtils.decrypt(key,temp,encrypted);
+                    CryptoUtils.decrypt(keyFile,temp,encrypted);
                 }
 
                 String fileName = mode.equals("enc")
@@ -95,6 +103,7 @@ public class FileUploadHandler extends HttpServlet
             catch(Exception ex)
             {
                 request.setAttribute("message", "File Enc/Dec Failed due to" + ex);
+                response.sendRedirect(request.getContextPath() + "?error=1" );
             }
 
         }
@@ -102,6 +111,7 @@ public class FileUploadHandler extends HttpServlet
         {
             request.setAttribute("message", "Sorry this Servlet only handles file upload request");
         }
+
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

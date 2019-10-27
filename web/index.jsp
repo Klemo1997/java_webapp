@@ -39,33 +39,15 @@
         <form name="fm" action="upload" method="post" id="crypto-form" enctype="multipart/form-data">
             <div class="input-group mt-2 mb-3">
                 <div class="custom-file">
-                    <input type="file" name="file" class="form-control" id="inputGroupFile01">
+                    <input type="file" name="file" class="form-control" id="inputGroupFile01" required="required">
                     <label class="custom-file-label" for="inputGroupFile01">Vyber súbor</label>
                 </div>
             </div>
-            <label class="custom-input-label" for="key" id="key-label">Šifrovací kľúč</label>
-            <div class="input-group input-group-sm mb-3">
-                <input type="text" class="form-control" id="key" name="key" placeholder="Zadaj kľúč">
-            </div>
-            <div class="input-group input-group-sm mb-3 text-center only-enc-visible">
-                <a id="enable-generate" href="#">Vygenerovať kľúč</a>
-                <div class="generate-key-div d-none">
 
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="key-bits">Dĺžka v bitoch</label>
-                        </div>
-                        <select class="custom-select" id="key-bits">
-                            <option value="128" selected>128</option>
-                            <option value="192">192</option>
-                            <option value="256">256</option>
-                        </select>
-
-                    </div>
-                    <div class="input-group input-group-sm mt-3 mb-2">
-                        <button class="btn btn-primary generate-key-btn">Generuj</button>
-                    </div>
-
+            <div class="input-group mt-2 mb-3">
+                <div class="custom-file">
+                    <input type="file" name="keyFile" class="form-control" id="inputGroupFile02" required="required">
+                    <label class="custom-file-label" id="key_label" for="inputGroupFile02">Nahraj verejný kľúč</label>
                 </div>
             </div>
 
@@ -106,53 +88,18 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script type="application/javascript">
     $('input[type=radio][name=cryption-type]').on('change', function () {
-        var keystr = $(this).val() === 'enc'
-            ? 'Šifrovací kľúč'
-            : 'Dešifrovací kľúč';
-
+          var keystr, keyfilestr;
         if ($(this).val() === 'enc') {
+            keyfilestr = 'Nahraj verejný kľúč';
             $('.only-enc-visible').removeClass('d-none');
         } else if ($(this).val() === 'dec') {
+            keyfilestr = 'Nahraj privátny kľúč';
             $('.only-enc-visible').addClass('d-none');
         }
 
-        $('#key-label').text(keystr);
-    })
-
-    $('#enable-generate').on('click', function () {
-        if ($('.generate-key-div').hasClass('d-none')) {
-            $('.generate-key-div').removeClass('d-none');
-        } else {
-            $('.generate-key-div').addClass('d-none');
-        }
-    })
-
-    $('.generate-key-btn').on('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var key_bytes = $('#key-bits').val() / 8;
-        var rand_string = generateId(key_bytes);
-        $('#key').val(rand_string);
-    })
-
-    $('#crypto-form').on('submit', function (e) {
-       if (![128/8,192/8,256/8].includes($('#key').val().length)) {
-           e.stopPropagation();
-           e.preventDefault();
-           alert('Dĺžka kľúča nesedí');
-       }
+        $('#key_label').text(keyfilestr)
     });
 
-    function dec2hex (dec) {
-        return ('0' + dec.toString(16)).substr(-2)
-    }
-
-    // generateId :: Integer -> String
-    function generateId (len) {
-        var arr = new Uint8Array((len || 40) / 2)
-        window.crypto.getRandomValues(arr)
-        return Array.from(arr, dec2hex).join('')
-    }
 
 </script>
 </body>

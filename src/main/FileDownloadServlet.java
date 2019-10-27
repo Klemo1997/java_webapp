@@ -1,15 +1,74 @@
 package main;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
 public class FileDownloadServlet extends HttpServlet {
+
+
+    private final String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doGet(req, resp);
+
+         File temp = null;
+         boolean checkBoxVal = false;
+
+        if(ServletFileUpload.isMultipartContent(req)) {
+
+            List<FileItem> multiparts = null;
+            try {
+                multiparts = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(req);
+
+
+                for(FileItem item : multiparts)
+                {
+                    if (item.getFieldName().equals("keyFile")) {
+                        String name = new File(item.getName()).getName();
+                        temp = new File(KEYDIR + File.separator + "tempKey");
+                        item.write(temp);
+                    } else {
+                        if(item.isFormField()) {
+                            checkBoxVal = item.getString().equals("on");
+                        }
+
+                    }
+                }
+
+
+
+                if (!checkBoxVal) {
+                    doGet(req, resp);
+                }
+
+                //Vyparsujeme filename z urlky
+                String[] parsedUrl = new String(req.getRequestURL()).split("/");
+
+                // Posledny prvok bude nas parameter pre file
+                String filename = parsedUrl[parsedUrl.length - 1].split("\\?")[0];
+
+
+
+                decryptAndDownloadFile(filename, temp, resp);
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
     }
 
     @Override
@@ -24,9 +83,9 @@ public class FileDownloadServlet extends HttpServlet {
         String filename = parsedUrl[parsedUrl.length - 1].split("\\?")[0];
 
         if (decrypt) {
-            decryptAndDownloadFile(filename, response);
+
         } else {
-            downloadFile(filename, response);
+            downloadFile(filename, null, response);
         }
     }
 
@@ -37,7 +96,7 @@ public class FileDownloadServlet extends HttpServlet {
      * @param response
      * @throws IOException
      */
-    private void downloadFile(String filename, HttpServletResponse response) throws IOException {
+    private void downloadFile(String filename, String desiredName , HttpServletResponse response) throws IOException {
         File toDownload = getFileFromName(filename);
 
         OutputStream out = response.getOutputStream();
@@ -50,8 +109,17 @@ public class FileDownloadServlet extends HttpServlet {
             out.write(buffer, 0, length);
         }
 
+        desiredName = desiredName == null
+                ? filename
+                : desiredName;
+
+        response.setContentType("application/x-msdownload");
+        response.setHeader("Content-Disposition", "attachment; filename=" +  desiredName);
+
+
         in.close();
         out.flush();
+        out.close();
     }
 
     /**
@@ -60,17 +128,27 @@ public class FileDownloadServlet extends HttpServlet {
      * @param filename
      * @param response
      */
-    private void decryptAndDownloadFile(String filename, HttpServletResponse response){
+    private void decryptAndDownloadFile(String filename, File tempKey, HttpServletResponse response) throws Exception {
         //todo: decrypt
+        File toDownload = getFileFromName(filename);
+        File tempDownloadFile =  new File(KEYDIR + File.separator + "tempFile");
 
-        //downloadFile(filename);
+        CryptoUtils cryptoUtils = new CryptoUtils();
+
+        cryptoUtils.decrypt(tempKey, toDownload, tempDownloadFile);
+
+        downloadFile(tempDownloadFile.getName(), toDownload.getName().replace(".enc", "") , response);
+
 
         //todo: delete temp
     }
 
     private File getFileFromName(String fileName) {
         FileListManager flm = new FileListManager();
-        String path = flm.getUploads().get(fileName);
+        String path = flm.getUploads().get(fileName) == null
+            ? flm.getKeys().get(fileName)
+            : flm.getUploads().get(fileName);
+
         return new File(path);
     }
 }

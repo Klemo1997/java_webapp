@@ -52,7 +52,7 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
                 <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
-                    <li class="list-group-item"><div class="to-left"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i></div> <%=entry.getKey()%> <a href="download/<%=entry.getKey()%>"><i class="fas fa-download"></i></a></li>
+                    <form name="downloadfile" method="post" action="download/<%=entry.getKey()%>" enctype="multipart/form-data"><li class="list-group-item"><div class="to-left"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i><input type="file" name="keyFile" class="d-none"></div> <%=entry.getKey()%> <button type="submit"><i class="fas fa-download"></i></button></li></form>
                 <% } %>
         </ul>
     </div>
@@ -73,9 +73,11 @@
         float: left;
     }
 
-    .list-group a {
+    .list-group-item button {
         float: right;
         display: inline-block;
+        border: none;
+        background-color: transparent;
     }
 
 </style>
@@ -85,13 +87,16 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script>
     $('.list-group-item a').on('click', function () {
-
-        var checkbox_checked = $(this).siblings('.to-left').find('input').is(':checked');
-
+        var checkbox_checked = $(this).parent().find('.to-left').find('input').is(':checked');
+        alert(checkbox_checked);
         if (checkbox_checked) {
             window.location.replace($(this).attr('href') + '?decrypt=true');
         }
     });
+
+    $('input[type=checkbox]').on('change', function () {
+        $(this).siblings('input[type=file]').toggleClass("d-none");
+    })
 </script>
 </body>
 </html>

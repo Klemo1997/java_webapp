@@ -7,6 +7,9 @@
         <element id="directory" name="classes">
           <element id="module-output" name="java_webapp" />
         </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="commons-fileupload-1.3.11" />
+        </element>
       </element>
     </root>
   </artifact>

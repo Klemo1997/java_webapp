@@ -1,20 +1,13 @@
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
+package main;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.nio.file.Files;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 
 /**
@@ -26,13 +19,13 @@ public class RsaKeyGenerator {
 	private Cipher cipher;
 	private PrivateKey privateKey;
     private PublicKey publicKey;
+    private SecretKeySpec secretKey;
 
 	public RsaKeyGenerator() throws NoSuchAlgorithmException, NoSuchPaddingException {
 		// TODO Auto-generated constructor stub
 		this.cipher = Cipher.getInstance("RSA");
-
 	}
-	public KeyPair getKeyPair(String filename) throws NoSuchAlgorithmException {
+	public KeyPair getKeyPair() throws NoSuchAlgorithmException {
 		
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024);
@@ -57,22 +50,32 @@ public class RsaKeyGenerator {
 		return kf.generatePublic(spec);
 	}
 	
-	 public static String encrypt(String key, PublicKey publicKey) throws Exception {
+	 public static byte[] encrypt(byte[] symmetricKey, PublicKey publicKey) throws Exception {
 	        Cipher encryptCipher = Cipher.getInstance("RSA");
 	        encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
-	        byte[] cipherText = encryptCipher.doFinal(key.getBytes(UTF_8));
+	        byte[] encryptedSymKey = encryptCipher.doFinal(symmetricKey);
 
-	        return Base64.getEncoder().encodeToString(cipherText);
+	        return encryptedSymKey;
 	    }
 	 
-	 public static String decrypt(String key, PrivateKey privateKey) throws Exception {
-	        byte[] bytes = Base64.getDecoder().decode(key);
-
+	 public static byte[] decrypt(byte[] cryptedKey, PrivateKey privateKey) throws Exception {
 	        Cipher decriptCipher = Cipher.getInstance("RSA");
 	        decriptCipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-	        return new String(decriptCipher.doFinal(bytes), UTF_8);
+
+	        return decriptCipher.doFinal(cryptedKey);
 	    }
+
+	public SecretKeySpec getSymmetricKey(){
+
+        int length = 128/8;
+        SecureRandom rnd = new SecureRandom();
+        byte [] key = new byte [length];
+        rnd.nextBytes(key);
+        this.secretKey = new SecretKeySpec(key, "AES");
+
+        return this.secretKey;
+    }
 	
 }
