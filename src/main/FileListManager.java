@@ -12,8 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileListManager {
-    private final static String UPLOADDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
-    private final static String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
+
+    private final static String UPLOADDIRECTORY = "/usr/local/uploads";
+    private final static String KEYDIR = "/usr/local/keys";
 
     public  Map<String, String> getUploads(){
         Map<String, String> fileMap = new HashMap<String, String>();

@@ -1,3 +1,4 @@
+package main;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -11,15 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.FileStore;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.UserDefinedFileAttributeView;
+import java.net.MalformedURLException;
 import java.util.List;
 
 public class FileUploadHandler extends HttpServlet
@@ -27,7 +20,11 @@ public class FileUploadHandler extends HttpServlet
     private static final long serialVersionUID = 1L;
     public static String setMetaString = null;
     public static String privateKeyToSee = null;
-    private final String UPLOADDIRECTORY = "C:/Users/adria/eclipse-workspace/upb/uploads";
+
+    private final String UPLOADDIRECTORY = "/usr/local/uploads";
+
+    public FileUploadHandler() throws MalformedURLException {
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -90,27 +87,15 @@ public class FileUploadHandler extends HttpServlet
 
                 response.setContentType("application/x-msdownload");
                 response.setHeader("Content-Disposition", "attachment; filename=" +  fileName);
-                
-                
-                FileStore fs = Files.getFileStore(encrypted.toPath());
-                if (fs.supportsFileAttributeView("basic"))
-                if (setMetaString != null && privateKeyToSee != null) {
-                	// response.setHeader("metadata", setMetaString);
-                	// malo by nasetovat atribut zo zasifrovanej RSA a AES z vrateneho retazca v cryptoUtils
-                	UserDefinedFileAttributeView view = Files
-                		    .getFileAttributeView(encrypted.toPath(), UserDefinedFileAttributeView.class);
-                	String name = "user.myAttribute";
-                	view.write(name, Charset.defaultCharset().encode(setMetaString));
-                	ByteBuffer buf = ByteBuffer.allocate(view.size(name));
-                	view.read(name, buf);
-                	buf.flip();
-                	String value = Charset.defaultCharset().decode(buf).toString();
-                	System.out.println(String.format("Public Key -> %s \n Private Key -> %s \n", value, privateKeyToSee));
-                	// Files.setAttribute(encrypted.toPath(), "basic:read", setMetaString, LinkOption.NOFOLLOW_LINKS);
-                	Files.getAttribute(encrypted.toPath(), name, LinkOption.NOFOLLOW_LINKS);
-//                	Files.write(encrypted.toPath(), setMetaString.getBytes(), StandardOpenOption.APPEND);
-                	
-                	// Files.setAttribute(encrypted.toPath(), "dos:readonly", setMetaString);
+
+                OutputStream out = response.getOutputStream();
+                FileInputStream in = new FileInputStream(encrypted);
+
+                byte[] buffer = new byte[4096];
+                int length;
+                while((length = in.read(buffer)) > 0)
+                {
+                    out.write(buffer, 0, length);
                 }
 
                 FileDownloadServlet fileDownload = new FileDownloadServlet();

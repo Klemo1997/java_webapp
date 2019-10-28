@@ -27,13 +27,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded">Nahrať súbor</a>
+                    <a class="nav-link" href="/java_webapp_war">Nahrať súbor</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/files.jsp">Moje súbory</a>
+                    <a class="nav-link" href="/java_webapp_war/files.jsp">Moje súbory</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp">Pregenerovať kľúče</a>
+                    <a class="nav-link" href="/java_webapp_war/key_manager.jsp">Pregenerovať kľúče</a>
                 </li>
             </ul>
         </div>

@@ -12,12 +12,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.util.List;
 
 public class FileDownloadServlet extends HttpServlet {
 
+    private final String KEYDIR = "/usr/local/keys";
 
-    private final String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
+    public FileDownloadServlet() throws MalformedURLException {
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -109,6 +113,8 @@ public class FileDownloadServlet extends HttpServlet {
             out.write(buffer, 0, length);
         }
 
+
+
         desiredName = desiredName == null
                 ? filename
                 : desiredName;
@@ -143,7 +149,7 @@ public class FileDownloadServlet extends HttpServlet {
         //todo: delete temp
     }
 
-    private File getFileFromName(String fileName) {
+    private File getFileFromName(String fileName) throws MalformedURLException {
         FileListManager flm = new FileListManager();
         String path = flm.getUploads().get(fileName) == null
             ? flm.getKeys().get(fileName)

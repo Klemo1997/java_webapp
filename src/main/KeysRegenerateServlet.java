@@ -8,12 +8,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 
 public class KeysRegenerateServlet extends HttpServlet {
 
-    private final static String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys/";
+    private final String KEYDIR = "/usr/local/keys";
+
+    public KeysRegenerateServlet() throws MalformedURLException {
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -36,7 +40,6 @@ public class KeysRegenerateServlet extends HttpServlet {
             e.printStackTrace();
             resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?/error=1" );
         }
-
     }
 
     private void writeToFile(File keyFile, byte[] keyBytes) throws IOException {

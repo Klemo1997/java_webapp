@@ -17,7 +17,6 @@ public class CryptoUtils
 {
     private static final String ALGORITHM="AES";
     private static final String TRANSFORMATION="AES";
-    private static final String KEYSDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/keys";
     private static final int FILE_SIZE_LIMIT = 536870912;
 
     public static void encrypt(File pubKey, File inputFile, File outputFile) throws Exception
@@ -70,7 +69,10 @@ public class CryptoUtils
 
             // Zapiseme do streamu
             outputStream.write(output.toByteArray());
-          
+
+
+            pubKey.delete();
+
             inputStream.close();
             outputStream.close();
         } catch(
@@ -105,7 +107,7 @@ public class CryptoUtils
             inputBytes = Arrays.copyOfRange(inputBytes, 128, inputBytes.length);
 
             // get symmetric key from crypted data
-            Key cryptedKeyFromFile =  new SecretKeySpec(rsa.decrypt(cryptedKey, getPrivateKey(privKey)), "AES");
+            Key cryptedKeyFromFile =  new SecretKeySpec(rsa.decrypt(cryptedKey, getPrivateKey(privKey)), ALGORITHM);
 
             // check mac
             if (!checkMac(inputFile, inputBytes, Base64.getEncoder().encodeToString(cryptedKeyFromFile.getEncoded()))) {
@@ -124,6 +126,8 @@ public class CryptoUtils
 
             FileOutputStream outputStream = new FileOutputStream(outputFile);
             outputStream.write(outputBytes);
+
+            privKey.delete();
 
             inputStream.close();
             outputStream.close();

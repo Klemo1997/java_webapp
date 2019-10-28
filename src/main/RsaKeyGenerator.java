@@ -63,7 +63,6 @@ public class RsaKeyGenerator {
 	        Cipher decriptCipher = Cipher.getInstance("RSA");
 	        decriptCipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-
 	        return decriptCipher.doFinal(cryptedKey);
 	    }
 
