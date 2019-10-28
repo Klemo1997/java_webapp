@@ -54,7 +54,7 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
                 <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
-                    <form name="downloadfile" method="post" action="download/<%=entry.getKey()%>" enctype="multipart/form-data"><li class="list-group-item"><div class="to-left"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i><input type="file" name="keyFile" class="d-none"></div> <%=entry.getKey()%> <button type="submit"><i class="fas fa-download"></i></button></li></form>
+                    <form name="downloadfile" method="post" action="download/<%=entry.getKey()%>" enctype="multipart/form-data"><li class="list-group-item"><div class="to-left d-none"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i><input type="file" name="keyFile" class="d-none"></div> <%=entry.getKey()%> <button type="submit"><i class="fas fa-download"></i></button></li></form>
                 <% } %>
         </ul>
     </div>

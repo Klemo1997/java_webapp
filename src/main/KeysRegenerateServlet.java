@@ -24,8 +24,8 @@ public class KeysRegenerateServlet extends HttpServlet {
         //todo vymaz stare keys
         try {
             RsaKeyGenerator rkg = new RsaKeyGenerator();
-            File privKey = new File(KEYDIR + "privKey");
-            File pubKey = new File(KEYDIR + "pubKey");
+            File privKey = new File(KEYDIR + File.separator +"privKey");
+            File pubKey = new File(KEYDIR + File.separator +"pubKey");
 
             KeyPair pair = rkg.getKeyPair();
 

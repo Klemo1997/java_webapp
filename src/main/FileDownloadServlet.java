@@ -18,6 +18,7 @@ import java.util.List;
 public class FileDownloadServlet extends HttpServlet {
 
     private final String KEYDIR = "/usr/local/keys";
+    private final String UPLOADDIRECTORY = "/usr/local/uploads";
 
     public FileDownloadServlet() throws MalformedURLException {
     }
@@ -48,8 +49,6 @@ public class FileDownloadServlet extends HttpServlet {
 
                     }
                 }
-
-
 
                 if (!checkBoxVal) {
                     doGet(req, resp);
@@ -101,7 +100,13 @@ public class FileDownloadServlet extends HttpServlet {
      * @throws IOException
      */
     private void downloadFile(String filename, String desiredName , HttpServletResponse response) throws IOException {
-        File toDownload = getFileFromName(filename);
+
+        File toDownload = null;
+
+        toDownload = new File(UPLOADDIRECTORY + File.separator + filename);
+        if (!toDownload.exists()) {
+            toDownload = new File(KEYDIR + File.separator + filename);
+        }
 
         OutputStream out = response.getOutputStream();
         FileInputStream in = new FileInputStream(toDownload);
@@ -136,15 +141,13 @@ public class FileDownloadServlet extends HttpServlet {
      */
     private void decryptAndDownloadFile(String filename, File tempKey, HttpServletResponse response) throws Exception {
         //todo: decrypt
-        File toDownload = getFileFromName(filename);
+        File toDownload = new File(filename);
         File tempDownloadFile =  new File(KEYDIR + File.separator + "tempFile");
 
         CryptoUtils cryptoUtils = new CryptoUtils();
 
         cryptoUtils.decrypt(tempKey, toDownload, tempDownloadFile);
-
         downloadFile(tempDownloadFile.getName(), toDownload.getName().replace(".enc", "") , response);
-
 
         //todo: delete temp
     }

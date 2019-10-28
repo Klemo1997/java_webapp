@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +34,13 @@ public class FileListManager {
 
         for (String item : uploads) {
             String itemName = item.substring(item.lastIndexOf("\\") + 1);
-            fileMap.put(itemName, item.replace("\\", "/"));
+            if (itemName.contains(".enc")) {
+                fileMap.put(itemName, item.replace("\\", "/"));
+            } else {
+                File file = new File(itemName);
+                file.delete();
+            }
+
         }
         return fileMap;
     }
@@ -55,7 +62,9 @@ public class FileListManager {
 
         for (String item : uploads) {
             String itemName = item.substring(item.lastIndexOf("\\") + 1);
-            fileMap.put(itemName, item.replace("\\", "/"));
+            if (!itemName.contains("tempKey")){
+                fileMap.put(itemName, item.replace("\\", "/"));
+            }
         }
         return fileMap;
     }
