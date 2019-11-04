@@ -81,10 +81,6 @@ public class FileUploadHandler extends HttpServlet
                     CryptoUtils.decrypt(keyFile,temp,encrypted);
                 }
 
-                if (!temp.delete()) {
-                    response.sendRedirect(request.getContextPath() + "?error=1" );
-                }
-
                 String fileName = mode.equals("enc")
                     ? encrypted.getName()
                     : encrypted.getName().replace(".enc", "");
@@ -104,6 +100,10 @@ public class FileUploadHandler extends HttpServlet
 
                 FileDownloadServlet fileDownload = new FileDownloadServlet();
                 fileDownload.doGet(request, response);
+                // Neviem ci to s tymto funguje tak to pushnem aspon zakomentovane :D
+//                if (!temp.delete()) {
+//                    // Exception file delete failed
+//                }
 
                 request.setAttribute("message","File Uploaded Successfully");
             }
