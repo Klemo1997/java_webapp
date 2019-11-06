@@ -85,10 +85,12 @@ public class FileUploadHandler extends HttpServlet
                     ? encrypted.getName()
                     : encrypted.getName().replace(".enc", "");
 
+                OutputStream out = response.getOutputStream();
+
                 response.setContentType("application/x-msdownload");
                 response.setHeader("Content-Disposition", "attachment; filename=" +  fileName);
 
-                OutputStream out = response.getOutputStream();
+
                 FileInputStream in = new FileInputStream(encrypted);
 
                 byte[] buffer = new byte[4096];
@@ -97,20 +99,22 @@ public class FileUploadHandler extends HttpServlet
                 {
                     out.write(buffer, 0, length);
                 }
-
-                FileDownloadServlet fileDownload = new FileDownloadServlet();
-                fileDownload.doGet(request, response);
                 // Neviem ci to s tymto funguje tak to pushnem aspon zakomentovane :D
-//                if (!temp.delete()) {
-//                    // Exception file delete failed
-//                }
-
+                if (!temp.delete()) {
+                    throw new Exception("Temp file not deleted properly");
+                }
                 request.setAttribute("message","File Uploaded Successfully");
+                out.flush();
             }
             catch(Exception ex)
             {
                 request.setAttribute("message", "File Enc/Dec Failed due to" + ex);
-                response.sendRedirect(request.getContextPath() + "?error=1" );
+                if (ex.getMessage().equals("Temp file not deleted properly")) {
+                    response.sendRedirect(request.getContextPath() + "?error=2" );
+                } else {
+                    response.sendRedirect(request.getContextPath() + "?error=1" );
+                }
+
             }
 
         }

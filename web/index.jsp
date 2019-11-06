@@ -33,20 +33,24 @@
 
 <div class="container text-center mt-5">
 
+    <div class="alert alert-danger hidden error-flash" role="alert">
+        Upload súboru zlyhal, skúste to znova, prosím.
+    </div>
+
     <div class="form-box text-center" align="center">
         <h3> Vyber súbor </h3>
 
         <form name="fm" action="upload" method="post" id="crypto-form" enctype="multipart/form-data">
             <div class="input-group mt-2 mb-3">
                 <div class="custom-file">
-                    <input type="file" name="file" class="form-control" id="inputGroupFile01" required="required">
+                    <input type="file" name="file" class="custom-file-input form-control" id="inputGroupFile01" required="required">
                     <label class="custom-file-label" for="inputGroupFile01">Vyber súbor</label>
                 </div>
             </div>
 
             <div class="input-group mt-2 mb-3">
                 <div class="custom-file">
-                    <input type="file" name="keyFile" class="form-control" id="inputGroupFile02" required="required">
+                    <input type="file" name="keyFile" class="custom-file-input form-control" id="inputGroupFile02" required="required">
                     <label class="custom-file-label" id="key_label" for="inputGroupFile02">Nahraj verejný kľúč</label>
                 </div>
             </div>
@@ -82,8 +86,15 @@
         width: 100%;
     }
 
+    .hidden {
+        display: none;
+    }
+
 </style>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script
+        src="http://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script type="application/javascript">
@@ -98,6 +109,24 @@
         }
 
         $('#key_label').text(keyfilestr)
+    });
+
+    var url = new URL(window.location.href);
+    if (url.searchParams.get('error') === "1") {
+        $('.error-flash').show();
+    }
+
+    $('.error-flash').on('click', function () {
+        $(this).fadeOut(400, function () {
+            $(this).hide();
+        });
+    });
+
+
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
 
 
