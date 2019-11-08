@@ -16,10 +16,45 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <%
-    FileListManager flm = new FileListManager();
-    Map<String, String> uploadfiles =  flm.getUploads();
+    //allow access only if session exists
+    String user = null;
+
+    if (session.getAttribute("userId") == null) {
+        response.sendRedirect("login.jsp");
+    } else {
+        user = (String) session.getAttribute("userId");
+    }
+    String userName = null;
+    String userId = null;
+    String sessionID = null;
+
+    Cookie[] cookies = request.getCookies();
+
+    if (cookies !=null) {
+        for (Cookie cookie : cookies) {
+
+            if (cookie.getName().equals("user")) {
+                userName = cookie.getValue();
+            }
+
+            if (cookie.getName().equals("userId")) {
+                userId = cookie.getValue();
+            }
+
+            if (cookie.getName().equals("JSESSIONID")) {
+                sessionID = cookie.getValue();
+            }
+        }
+    }
+    Map<String, String> uploadfiles = null;
+    if (userId != null) {
+        FileListManager flm = new FileListManager(userId);
+        uploadfiles =  flm.getUploads();
+    }
 %>
+
 <html>
 <head>
     <title>Moje súbory</title>
@@ -27,34 +62,47 @@
     <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">UBP</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/java_webapp_war">Nahrať súbor</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/java_webapp_war/files.jsp">Moje súbory</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/java_webapp_war/key_manager.jsp">Pregenerovať kľúče</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container" style="margin: 0 auto;">
+            <a class="navbar-brand" href="#">UBP</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/java_webapp_war_exploded">Nahrať súbor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/java_webapp_war_exploded/files.jsp">Moje súbory</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp">Pregenerovať kľúče</a>
+                    </li>
 
-<!-- /Navbar -->
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" style="line-height: 40px;">
+                        Prihlásený ako: <%= userName %>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/java_webapp_war_exploded/logout"> Odhlásiť sa</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- /Navbar -->
 
     <div class="container text-center border border-primary">
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
-                <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
+                <% if (uploadfiles != null) { %>
+                    <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
                     <form name="downloadfile" method="post" action="download/<%=entry.getKey()%>" enctype="multipart/form-data"><li class="list-group-item"><div class="to-left d-none"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i><input type="file" name="keyFile" class="d-none"></div> <%=entry.getKey()%> <button type="submit"><i class="fas fa-download"></i></button></li></form>
+                    <% } %>
                 <% } %>
         </ul>
     </div>

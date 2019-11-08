@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,14 +18,22 @@ import java.util.List;
 
 public class FileDownloadServlet extends HttpServlet {
 
-    private final String KEYDIR = "/usr/local/keys";
-    private final String UPLOADDIRECTORY = "/usr/local/uploads";
+    private String KEYDIR = "/usr/local/keys";
+    private String UPLOADDIRECTORY = "/usr/local/uploads";
+
+//    private String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
+//    private String UPLOADDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
+
 
     public FileDownloadServlet() throws MalformedURLException {
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        HttpSession session = req.getSession();
+        this.KEYDIR = this.KEYDIR + "/" + session.getAttribute("userId");
+        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + session.getAttribute("userId");
 
          File temp = null;
          boolean checkBoxVal = false;
@@ -76,6 +85,10 @@ public class FileDownloadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        this.KEYDIR = this.KEYDIR + "/" + session.getAttribute("userId");
+        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + session.getAttribute("userId");
+
         // Dec or nah
         boolean decrypt = request.getParameter("decrypt") != null;
 
@@ -150,15 +163,6 @@ public class FileDownloadServlet extends HttpServlet {
         downloadFile(tempDownloadFile.getName(), toDownload.getName().replace(".enc", "") , response);
 
         //todo: delete temp
-    }
-
-    private File getFileFromName(String fileName) throws MalformedURLException {
-        FileListManager flm = new FileListManager();
-        String path = flm.getUploads().get(fileName) == null
-            ? flm.getKeys().get(fileName)
-            : flm.getUploads().get(fileName);
-
-        return new File(path);
     }
 }
 

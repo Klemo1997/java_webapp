@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,7 +22,9 @@ public class FileUploadHandler extends HttpServlet
     public static String setMetaString = null;
     public static String privateKeyToSee = null;
 
-    private final String UPLOADDIRECTORY = "/usr/local/uploads";
+    private String UPLOADDIRECTORY = "/usr/local/uploads";
+
+    //    private String UPLOADDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
 
     public FileUploadHandler() throws MalformedURLException {
     }
@@ -29,6 +32,9 @@ public class FileUploadHandler extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+        HttpSession session = request.getSession();
+        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + session.getAttribute("userId");
+
         // process only if its multipart content
         if(ServletFileUpload.isMultipartContent(request)) {
             try {
@@ -114,7 +120,6 @@ public class FileUploadHandler extends HttpServlet
                 } else {
                     response.sendRedirect(request.getContextPath() + "?error=1" );
                 }
-
             }
 
         }

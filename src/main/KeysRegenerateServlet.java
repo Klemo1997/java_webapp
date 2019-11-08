@@ -5,6 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,14 +15,19 @@ import java.security.NoSuchAlgorithmException;
 
 public class KeysRegenerateServlet extends HttpServlet {
 
-    private final String KEYDIR = "/usr/local/keys";
+    private String KEYDIR = "/usr/local/keys";
+//    private String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
+
 
     public KeysRegenerateServlet() throws MalformedURLException {
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        //todo vymaz stare keys
+
+        HttpSession session = req.getSession();
+        this.KEYDIR = this.KEYDIR + "/" + session.getAttribute("userId");
+
         try {
             RsaKeyGenerator rkg = new RsaKeyGenerator();
             File privKey = new File(KEYDIR + File.separator +"privKey");
@@ -38,7 +44,7 @@ public class KeysRegenerateServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?error=1" );
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?/error=1" );
+            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?/error=2" );
         }
     }
 

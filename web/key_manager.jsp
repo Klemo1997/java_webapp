@@ -8,8 +8,40 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    FileListManager flm = new FileListManager();
-    Map<String, String> keysFiles =  flm.getKeys();
+    //allow access only if session exists
+    String user = null;
+
+    if (session.getAttribute("userId") == null) {
+        response.sendRedirect("login.jsp");
+    } else {
+        user = (String) session.getAttribute("userId");
+    }
+    String userName = null;
+    String userId = null;
+    String sessionID = null;
+
+    Cookie[] cookies = request.getCookies();
+
+    if (cookies !=null) {
+        for(Cookie cookie : cookies){
+            if(cookie.getName().equals("user")) {
+                userName = cookie.getValue();
+            }
+            if(cookie.getName().equals("userId")) {
+                userId = cookie.getValue();
+            }
+            if(cookie.getName().equals("JSESSIONID")) {
+                sessionID = cookie.getValue();
+            }
+        }
+    }
+
+    Map<String, String> keysFiles = null;
+
+    if (userId != null) {
+        FileListManager flm = new FileListManager(userId);
+        keysFiles =  flm.getKeys();
+    }
 
 %>
 <html>
@@ -21,23 +53,35 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">UBP</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war">Nahrať súbor</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war/files.jsp">Moje súbory</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war/key_manager.jsp">Pregenerovať kľúče</a>
-                </li>
-            </ul>
-        </div>
+       <div class="container" style="margin: 0 auto;">
+           <a class="navbar-brand" href="#">UBP</a>
+           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+           </button>
+           <div class="collapse navbar-collapse" id="navbarNav">
+               <ul class="navbar-nav">
+                   <li class="nav-item">
+                       <a class="nav-link" href="/java_webapp_war_exploded">Nahrať súbor</a>
+                   </li>
+                   <li class="nav-item">
+                       <a class="nav-link" href="/java_webapp_war_exploded/files.jsp">Moje súbory</a>
+                   </li>
+                   <li class="nav-item">
+                       <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp">Pregenerovať kľúče</a>
+                   </li>
+
+               </ul>
+               <ul class="navbar-nav ml-auto">
+                   <li class="nav-item" style="line-height: 40px;">
+                       Prihlásený ako: <%= userName %>
+                   </li>
+
+                   <li class="nav-item">
+                       <a class="nav-link" href="/java_webapp_war_exploded/logout"> Odhlásiť sa</a>
+                   </li>
+               </ul>
+           </div>
+       </div>
     </nav>
     <!-- /Navbar -->
 
@@ -57,19 +101,21 @@
         <div class="container text-center border border-primary">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
-                <% for (Map.Entry<String,String> entry : keysFiles.entrySet()) { %>
-                <li class="list-group-item"><%=entry.getKey()%> <a class="to-right" href="download/<%=entry.getKey()%>"><i class="fas fa-download"></i></a></li>
+                <% if (keysFiles != null) {%>
+                    <% for (Map.Entry<String,String> entry : keysFiles.entrySet()) { %>
+                    <li class="list-group-item"><%=entry.getKey()%> <a class="to-right" href="download/<%=entry.getKey()%>"><i class="fas fa-download"></i></a></li>
+                    <% } %>
                 <% } %>
+
             </ul>
         </div>
-
     </div>
 
     <style>
+
         .to-right {
             float: right;
         }
-
         .container {
             padding: 0;
             margin-top: 50px;

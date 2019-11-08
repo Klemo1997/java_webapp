@@ -1,4 +1,16 @@
-<!DOCTYPE html>
+<%--
+  Created by IntelliJ IDEA.
+  User: matus
+  Date: 06-Nov-19
+  Time: 19:00
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    if (session.getAttribute("userId") != null) {
+        response.sendRedirect("index.jsp");
+    }
+%>
 <html>
 <head>
     <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
@@ -26,24 +38,22 @@
     </div>
 </nav>
 
+
+
 <div class="container text-center mt-5">
 
     <div class="form-box text-center" align="center">
-        <h2 class="display-5 mb-4"> Vytvorenie nového používateľa </h2>
+        <h2 class="display-5 mb-4"> Prihlásenie </h2>
 
-        <form name="fm" action="login" method="post" enctype="multipart/form-data">
+        <form name="login-data" action="login" method="post">
             <label class="custom-label" for="password">Prihlasovacie meno:</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Prihlasovacie meno">
+                <input type="text" class="form-control" placeholder="Prihlasovacie meno" name="user_login" required>
             </div>
 
             <label class="custom-label" for="password">Zadajte heslo:</label>
             <div class="input-group mb-4">
-                <input type="password" id="password" class="form-control" placeholder="Heslo">
-            </div>
-
-            <div class="input-group mb-4">
-                <input type="password" id="confirmpassword" class="form-control" placeholder="Potvrdiť heslo">
+                <input type="password" id="password" class="form-control" placeholder="Heslo" name="user_password" required>
             </div>
 
             <div class="input-group input-group-sm my-2">
@@ -59,7 +69,7 @@
     .form-box {
         margin: auto;
         background-color: #e6e6e6;
-        width: 550px;
+        width: 350px;
 
         padding: 20px 20px 20px 20px;
     }
@@ -89,7 +99,7 @@
 
         $('#key-label').text(keystr);
     })
-    
+
     $('#enable-generate').on('click', function () {
         if ($('.generate-key-div').hasClass('d-none')) {
             $('.generate-key-div').removeClass('d-none');
@@ -97,7 +107,7 @@
             $('.generate-key-div').addClass('d-none');
         }
     })
-    
+
     $('.generate-key-btn').on('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
