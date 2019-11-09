@@ -38,41 +38,41 @@
     <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
     <title>Nahraj súbor </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">UBP</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded">Nahrať súbor</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded/files.jsp">Moje súbory</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp">Pregenerovať kľúče</a>
-                    </li>
-
-                </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item" style="line-height: 40px;">
-                        Prihlásený ako: <%= userName %>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded/logout"> Odhlásiť sa</a>
-                    </li>
-                </ul>
-            </div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container" style="margin: 0 auto;">
+        <a class="navbar-brand" href="#">UBP</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/java_webapp_war_exploded"><i class="fas fa-upload"></i> Nahrať súbor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/java_webapp_war_exploded/files.jsp"><i class="fas fa-folder"></i> Moje súbory</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp"><i class="fas fa-key"></i> Pregenerovať kľúče</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item logged-as">
+                    Prihlásený ako: <%= userName %>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/java_webapp_war_exploded/logout"><i class="fas fa-power-off"></i> Odhlásiť sa</a>
+                </li>
+            </ul>
         </div>
-    </nav>
-    <!-- /Navbar -->
+    </div>
+</nav>
+<!-- /Navbar -->
 
 <div class="container text-center mt-5">
 
@@ -87,14 +87,14 @@
             <div class="input-group mt-2 mb-3">
                 <div class="custom-file">
                     <input type="file" name="file" class="custom-file-input form-control" id="inputGroupFile01" required="required">
-                    <label class="custom-file-label" for="inputGroupFile01">Vyber súbor</label>
+                    <label class="custom-file-label text-left" for="inputGroupFile01">Vyber súbor</label>
                 </div>
             </div>
 
             <div class="input-group mt-2 mb-3">
                 <div class="custom-file">
                     <input type="file" name="keyFile" class="custom-file-input form-control" id="inputGroupFile02" required="required">
-                    <label class="custom-file-label" id="key_label" for="inputGroupFile02">Nahraj verejný kľúč</label>
+                    <label class="custom-file-label text-left" id="key_label" for="inputGroupFile02">Nahraj verejný kľúč</label>
                 </div>
             </div>
 
@@ -115,25 +115,6 @@
     </div>
 </div>
 
-<style>
-
-    .form-box {
-        margin: auto;
-        background-color: #e6e6e6;
-        width: 350px;
-
-        padding: 20px 20px 20px 20px;
-    }
-
-    .generate-key-div {
-        width: 100%;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-</style>
 <script
         src="http://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="

@@ -1,0 +1,53 @@
+.hidden {
+    display: none;
+}
+
+.fas.fa-lock-open {
+    margin-right: 10px;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.to-left {
+    float: left;
+}
+
+.list-group-item button {
+    float: right;
+    display: inline-block;
+    border: none;
+    background-color: transparent;
+}
+
+.form-box {
+    margin: auto;
+    background-color: #e6e6e6;
+    width: 350px;
+
+    padding: 20px 20px 20px 20px;
+}
+
+.to-right {
+    float: right;
+}
+.container {
+    padding: 0;
+    margin-top: 50px;
+    margin-bottom: 40px;
+}
+
+nav .container {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.logged-as {
+    line-height: 40px;
+    color: white;
+    font-weight: 600;
+}
+
+.regenerate-keys {
+    width: 75%;
+    margin: auto;
+}

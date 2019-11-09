@@ -14,10 +14,11 @@
     <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
     <title>Registruj sa</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e6e6e6 !important;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
         <a class="navbar-brand" href="#">UBP</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +27,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/login.jsp">Prihlásenie</a>
+                    <a class="nav-link" href="/java_webapp_war_exploded/login.jsp"><i class="fas fa-sign-in-alt"></i> Prihlásenie</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/registration.jsp">Registrácia</a>
+                    <a class="nav-link" href="/java_webapp_war_exploded/registration.jsp"><i class="fas fa-user-plus"></i> Registrácia</a>
                 </li>
             </ul>
         </div>

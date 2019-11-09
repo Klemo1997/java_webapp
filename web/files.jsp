@@ -60,10 +60,11 @@
     <title>Moje súbory</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container" style="margin: 0 auto;">
             <a class="navbar-brand" href="#">UBP</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,23 +73,21 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded">Nahrať súbor</a>
+                        <a class="nav-link" href="/java_webapp_war_exploded"><i class="fas fa-upload"></i> Nahrať súbor</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded/files.jsp">Moje súbory</a>
+                        <a class="nav-link" href="/java_webapp_war_exploded/files.jsp"><i class="fas fa-folder"></i> Moje súbory</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp">Pregenerovať kľúče</a>
+                        <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp"><i class="fas fa-key"></i> Pregenerovať kľúče</a>
                     </li>
-
                 </ul>
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item" style="line-height: 40px;">
+                    <li class="nav-item logged-as">
                         Prihlásený ako: <%= userName %>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="/java_webapp_war_exploded/logout"> Odhlásiť sa</a>
+                        <a class="nav-link" href="/java_webapp_war_exploded/logout"><i class="fas fa-power-off"></i> Odhlásiť sa</a>
                     </li>
                 </ul>
             </div>
@@ -101,52 +100,20 @@
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
                 <% if (uploadfiles != null) { %>
                     <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
-                    <form name="downloadfile" method="post" action="download/<%=entry.getKey()%>" enctype="multipart/form-data"><li class="list-group-item"><div class="to-left d-none"><input type="checkbox" name="decrypt_or_nah" class="decrypt-check"><i class="fas fa-lock-open"></i><input type="file" name="keyFile" class="d-none"></div> <%=entry.getKey()%> <button type="submit"><i class="fas fa-download"></i></button></li></form>
+                    <li class="list-group-item">
+                        <%=entry.getKey()%>
+                         <a href="download/<%=entry.getKey()%>" class="to-right" type="submit">
+                             <i class="fas fa-download"></i>
+                         </a>
+                    </li>
                     <% } %>
                 <% } %>
         </ul>
     </div>
 
-
-<style>
-    .container {
-        padding: 0;
-        margin-top: 50px;
-    }
-    .fas.fa-lock-open {
-        margin-right: 10px;
-        margin-left: 10px;
-        font-size: 20px;
-    }
-
-    .to-left {
-        float: left;
-    }
-
-    .list-group-item button {
-        float: right;
-        display: inline-block;
-        border: none;
-        background-color: transparent;
-    }
-
-</style>
-
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script>
-    $('.list-group-item a').on('click', function () {
-        var checkbox_checked = $(this).parent().find('.to-left').find('input').is(':checked');
-        alert(checkbox_checked);
-        if (checkbox_checked) {
-            window.location.replace($(this).attr('href') + '?decrypt=true');
-        }
-    });
 
-    $('input[type=checkbox]').on('change', function () {
-        $(this).siblings('input[type=file]').toggleClass("d-none");
-    })
-</script>
 </body>
 </html>
