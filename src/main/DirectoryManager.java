@@ -13,12 +13,6 @@ public class DirectoryManager {
     private static final String PROJECT_ROOT = "C:/Users/matus/IdeaProjects/java_webapp";
     private static final String UPLOAD_ROOT = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
     private static final String KEYS_ROOT = "C:/Users/matus/IdeaProjects/java_webapp/keys";
-    // Setujeme pri kazdom prihlaseni znova
-    private static int userID;
-
-    public void setUserId(int id){
-        this.userID = id;
-    }
 
     public static String getProjectRoot(){
         return PROJECT_ROOT;
