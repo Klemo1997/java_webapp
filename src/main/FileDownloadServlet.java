@@ -18,12 +18,6 @@ import java.util.List;
 
 public class FileDownloadServlet extends HttpServlet {
 
-    private String KEYDIR = "/usr/local/keys";
-    private String UPLOADDIRECTORY = "/usr/local/uploads";
-
-//    private String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
-//    private String UPLOADDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
-
 
     public FileDownloadServlet() throws MalformedURLException {
     }
@@ -32,8 +26,6 @@ public class FileDownloadServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         HttpSession session = req.getSession();
-        this.KEYDIR = this.KEYDIR + "/" + session.getAttribute("userId");
-        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + session.getAttribute("userId");
 
          File temp = null;
          boolean checkBoxVal = false;
@@ -49,7 +41,7 @@ public class FileDownloadServlet extends HttpServlet {
                 {
                     if (item.getFieldName().equals("keyFile")) {
                         String name = new File(item.getName()).getName();
-                        temp = new File(KEYDIR + File.separator + "tempKey");
+                        temp = new File(DirectoryManager.getKeysRoot(session.getAttribute("userId")) + "tempKey");
                         item.write(temp);
                     } else {
                         if(item.isFormField()) {
@@ -71,7 +63,7 @@ public class FileDownloadServlet extends HttpServlet {
 
 
 
-                decryptAndDownloadFile(filename, temp, resp);
+                decryptAndDownloadFile(filename, temp, resp,(String) session.getAttribute("userId"));
 
 
             } catch (Exception e) {
@@ -86,8 +78,6 @@ public class FileDownloadServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        this.KEYDIR = this.KEYDIR + "/" + session.getAttribute("userId");
-        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + session.getAttribute("userId");
 
         // Dec or nah
         boolean decrypt = request.getParameter("decrypt") != null;
@@ -101,7 +91,7 @@ public class FileDownloadServlet extends HttpServlet {
         if (decrypt) {
 
         } else {
-            downloadFile(filename, null, response);
+            downloadFile(filename, null, response, (String) session.getAttribute("userId"));
         }
     }
 
@@ -112,13 +102,13 @@ public class FileDownloadServlet extends HttpServlet {
      * @param response
      * @throws IOException
      */
-    private void downloadFile(String filename, String desiredName , HttpServletResponse response) throws IOException {
+    private void downloadFile(String filename, String desiredName , HttpServletResponse response, String userId) throws IOException {
 
         File toDownload = null;
 
-        toDownload = new File(UPLOADDIRECTORY + File.separator + filename);
+        toDownload = new File(DirectoryManager.getUploadRoot(userId) + filename);
         if (!toDownload.exists()) {
-            toDownload = new File(KEYDIR + File.separator + filename);
+            toDownload = new File(DirectoryManager.getKeysRoot(userId) + filename);
         }
 
         OutputStream out = response.getOutputStream();
@@ -152,15 +142,15 @@ public class FileDownloadServlet extends HttpServlet {
      * @param filename
      * @param response
      */
-    private void decryptAndDownloadFile(String filename, File tempKey, HttpServletResponse response) throws Exception {
+    private void decryptAndDownloadFile(String filename, File tempKey, HttpServletResponse response, String userId) throws Exception {
         //todo: decrypt
         File toDownload = new File(filename);
-        File tempDownloadFile =  new File(KEYDIR + File.separator + "tempFile");
+        File tempDownloadFile =  new File(DirectoryManager.getKeysRoot(userId) + "tempFile");
 
         CryptoUtils cryptoUtils = new CryptoUtils();
 
         cryptoUtils.decrypt(tempKey, toDownload, tempDownloadFile);
-        downloadFile(tempDownloadFile.getName(), toDownload.getName().replace(".enc", "") , response);
+        downloadFile(tempDownloadFile.getName(), toDownload.getName().replace(".enc", "") , response, userId);
 
         //todo: delete temp
     }

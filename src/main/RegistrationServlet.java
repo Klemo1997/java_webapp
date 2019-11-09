@@ -21,6 +21,10 @@ public class RegistrationServlet extends HttpServlet {
             }
             //spravit salt a nahradit
             user.registerUser();
+            // Setneme userovi priecinky
+            if (!user.setDirectories()) {
+                throw new Exception("Failed while creating user directories");
+            }
 
             response.sendRedirect("index.jsp");
 

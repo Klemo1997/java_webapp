@@ -15,10 +15,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class KeysRegenerateServlet extends HttpServlet {
 
-    private String KEYDIR = "/usr/local/keys";
-//    private String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
-
-
     public KeysRegenerateServlet() throws MalformedURLException {
     }
 
@@ -26,12 +22,11 @@ public class KeysRegenerateServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         HttpSession session = req.getSession();
-        this.KEYDIR = this.KEYDIR + "/" + session.getAttribute("userId");
 
         try {
             RsaKeyGenerator rkg = new RsaKeyGenerator();
-            File privKey = new File(KEYDIR + File.separator +"privKey");
-            File pubKey = new File(KEYDIR + File.separator +"pubKey");
+            File privKey = new File(DirectoryManager.getKeysRoot(session.getAttribute("userId")) +"privKey");
+            File pubKey = new File(DirectoryManager.getKeysRoot(session.getAttribute("userId")) +"pubKey");
 
             KeyPair pair = rkg.getKeyPair();
 

@@ -22,10 +22,6 @@ public class FileUploadHandler extends HttpServlet
     public static String setMetaString = null;
     public static String privateKeyToSee = null;
 
-    private String UPLOADDIRECTORY = "/usr/local/uploads";
-
-    //    private String UPLOADDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
-
     public FileUploadHandler() throws MalformedURLException {
     }
 
@@ -33,7 +29,6 @@ public class FileUploadHandler extends HttpServlet
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         HttpSession session = request.getSession();
-        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + session.getAttribute("userId");
 
         // process only if its multipart content
         if(ServletFileUpload.isMultipartContent(request)) {
@@ -55,13 +50,13 @@ public class FileUploadHandler extends HttpServlet
                     {
                         if (item.getFieldName().equals("keyFile")) {
                             String name = new File(item.getName()).getName();
-                            keyFile = new File(UPLOADDIRECTORY + File.separator + "inputKey");
+                            keyFile = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + "inputKey");
                             item.write(keyFile);
                         } else {
                             String name = new File(item.getName()).getName();
-                            temp = new File(UPLOADDIRECTORY + File.separator + name);
+                            temp = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name);
                             item.write(temp);
-                            encrypted = new File(UPLOADDIRECTORY + File.separator + name + ".enc");
+                            encrypted = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name + ".enc");
                         }
 
                     }

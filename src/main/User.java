@@ -1,13 +1,8 @@
 package main;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -69,6 +64,10 @@ public class User {
         DbHandler db = new DbHandler();
         hashPassword();
         db.st.executeUpdate("INSERT INTO users(Name,Password,Salt) values ('" + this.userName + "','"+ this.password + "','" + this.salt + "');");
+
+        // Setneme ID
+        ResultSet rs = db.st.executeQuery("SELECT ID FROM users WHERE name='"+ this.userName +"';");
+        this.id = rs.getInt("ID");
     }
 
     public String getUserName() {
@@ -93,5 +92,20 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean setDirectories () {
+        return makeUserDir(DirectoryManager.getUploadRoot(this.id)) && makeUserDir(DirectoryManager.getKeysRoot(this.id));
+    }
+
+    private boolean makeUserDir(String directoryRoot) {
+        File dirToMake = new File(directoryRoot + File.separator + String.valueOf(this.id));
+        if (!dirToMake.exists()) {
+            dirToMake.mkdir();
+        } else {
+            // Directory uz existuje, nejaka picovina
+            return false;
+        }
+        return dirToMake.exists();
     }
 }

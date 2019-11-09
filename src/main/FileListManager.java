@@ -13,15 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileListManager {
-    private String UPLOADDIRECTORY = "/usr/local/uploads";
-    private String KEYDIR = "/usr/local/keys";
+    private String userId;
 
-//    private String KEYDIR = "C:/Users/matus/IdeaProjects/java_webapp/keys";
-//    private String UPLOADDIRECTORY = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
-
-    public FileListManager(String user_id){
-        this.KEYDIR = this.KEYDIR + "/" + user_id;
-        this.UPLOADDIRECTORY = this.UPLOADDIRECTORY + "/" + user_id;
+    public FileListManager(String userId){
+        this.userId = userId;
     }
 
     public  Map<String, String> getUploads(){
@@ -29,7 +24,7 @@ public class FileListManager {
 
         List<String> uploads = new ArrayList<>();
 
-        try (Stream<Path> walk = Files.walk(Paths.get(UPLOADDIRECTORY))) {
+        try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getUploadRoot(this.userId)))) {
 
             uploads = walk.filter(Files::isRegularFile)
                     .map(x -> x.toString()).collect(Collectors.toList());
@@ -57,7 +52,7 @@ public class FileListManager {
 
         List<String> uploads = new ArrayList<>();
 
-        try (Stream<Path> walk = Files.walk(Paths.get(KEYDIR))) {
+        try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getKeysRoot(this.userId)))) {
 
             uploads = walk.filter(Files::isRegularFile)
                     .map(x -> x.toString()).collect(Collectors.toList());
