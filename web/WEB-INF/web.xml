@@ -82,16 +82,13 @@
         <servlet-name>LogoutServ</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
-
     <servlet>
-        <servlet-name>databaseTest</servlet-name>
-        <servlet-class>main.DbTestServlet</servlet-class>
+        <servlet-name>RegServ</servlet-name>
+        <servlet-class>main.RegistrationServlet</servlet-class>
     </servlet>
-    <!--mapping-->
     <servlet-mapping>
-        <servlet-name>databaseTest</servlet-name>
-        <url-pattern>/test</url-pattern>
+        <servlet-name>RegServ</servlet-name>
+        <url-pattern>/register</url-pattern>
     </servlet-mapping>
-
-
+     <!--mapping-->
 </web-app>

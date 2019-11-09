@@ -31,7 +31,7 @@
                     <a class="nav-link" href="/java_webapp_war_exploded/login.jsp">Prihlásenie</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/">Registrácia</a>
+                    <a class="nav-link" href="/java_webapp_war_exploded/registration.jsp">Registrácia</a>
                 </li>
             </ul>
         </div>
