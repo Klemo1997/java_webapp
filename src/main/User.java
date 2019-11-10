@@ -164,9 +164,9 @@ public class User {
     }
 
     private boolean makeUserDir(String directoryRoot) {
-        File dirToMake = new File(directoryRoot + File.separator + String.valueOf(this.id));
+        File dirToMake = new File(directoryRoot);
         if (!dirToMake.exists()) {
-            dirToMake.mkdir();
+            dirToMake.mkdirs();
         } else {
             // Directory uz existuje, nejaka picovina
             return false;
