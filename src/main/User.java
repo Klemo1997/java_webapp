@@ -1,58 +1,118 @@
 package main;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.io.File;
+import java.math.BigInteger;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Random;
 
 public class User {
 
     private String userName;
     private String password;
-    private String salt;
+    private byte[] salt;
     private int id;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public User()
     {
 
     }
 
-    public void setUser(String userName, String password)
-    {
+    public void setUser(String userName, String password) throws NoSuchAlgorithmException {
         this.userName = userName;
         this.password = password;
-        //to je len zatial aby som nejaky salt mala
-        String generateSalt = "blabvlabla456";
-        //tu sa ma generovat salt asi
-        this.salt = generateSalt;
+        getNextSalt();
     }
 
-    public void hashPassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
-//        SecureRandom random = new SecureRandom();
-//        byte[] salt = new byte[16];
-//        random.nextBytes(salt);
-//
-//        KeySpec spec = new PBEKeySpec(this.password.toCharArray(), salt, 65536, 128);
-//        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-//
-//        byte[] hashedPassword = factory.generateSecret(spec).getEncoded();
-//        this.password = hashedPassword.toString();
+    public void getNextSalt() throws NoSuchAlgorithmException {
+        this.salt = new byte[16];
+        RANDOM.getInstance("SHA1PRNG");
+        RANDOM.nextBytes(this.salt);
     }
 
     public boolean verify() throws SQLException, ClassNotFoundException, InvalidKeySpecException, NoSuchAlgorithmException {
         DbHandler db = new DbHandler();
-        ResultSet rs = db.st.executeQuery("select ID from users where users.name = '" + this. userName + "' and users.password = '" + this.password + "';");
+        PreparedStatement query = db.connection.prepareStatement("select ID,Password,Salt from users where users.name = ? ");
+        query.setString(1, this.userName);
+        ResultSet rs  = query.executeQuery();
+
         if(rs.next()) {
             this.setId(rs.getInt(1));
-            return true;
+            String stored = rs.getString(2);
+            String storedSALT = rs.getString(3);
+
+            if(validatePassword(this.password, stored, storedSALT)){
+                return true;
+            }
         }
         return false;
     }
 
+    public String hashPassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
+        int iter = 1000;
+        byte[] salt = this.salt;
+        char[] passwd = this.password.toCharArray();
+
+        PBEKeySpec spec = new PBEKeySpec(passwd, salt, iter, 64 * 8);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        byte[] hash = skf.generateSecret(spec).getEncoded();
+        return iter + ":" + toHex(hash);
+    }
+    private static String toHex(byte[] array) throws NoSuchAlgorithmException
+    {
+        BigInteger bi = new BigInteger(1, array);
+        String hex = bi.toString(16);
+        int paddingLength = (array.length * 2) - hex.length();
+        if(paddingLength > 0)
+        {
+            return String.format("%0"  +paddingLength + "d", 0) + hex;
+        }else{
+            return hex;
+        }
+    }
+
+    private static boolean validatePassword(String originalPassword, String storedPassword, String salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        String[] parts = storedPassword.split(":");
+        int iterations = Integer.parseInt(parts[0]);
+        byte[] hash = fromHex(parts[1]);
+        byte[] storedSalt = fromHex(salt);
+        PBEKeySpec spec = new PBEKeySpec(originalPassword.toCharArray(), storedSalt, iterations, hash.length * 8);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        byte[] testHash = skf.generateSecret(spec).getEncoded();
+
+        int diff = hash.length ^ testHash.length;
+        for(int i = 0; i < hash.length && i < testHash.length; i++)
+        {
+            diff |= hash[i] ^ testHash[i];
+        }
+        return diff == 0;
+    }
+    private static byte[] fromHex(String hex) throws NoSuchAlgorithmException
+    {
+        byte[] bytes = new byte[hex.length() / 2];
+        for(int i = 0; i<bytes.length ;i++)
+        {
+            bytes[i] = (byte)Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
+        }
+        return bytes;
+    }
+
     public boolean checkUser(String userToRegister) throws SQLException, ClassNotFoundException {
         DbHandler db = new DbHandler();
-        ResultSet rs = db.st.executeQuery("select Name from users where users.name = '" + userToRegister +"';");
+        PreparedStatement query = db.connection.prepareStatement("select Name from users where users.name = ?");
+        query.setString(1, userToRegister);
+        ResultSet rs=query.executeQuery();
         return rs.next();
     }
 
@@ -62,12 +122,17 @@ public class User {
 
     public void registerUser() throws SQLException, ClassNotFoundException, NoSuchAlgorithmException, InvalidKeySpecException {
         DbHandler db = new DbHandler();
-        hashPassword();
-        db.st.executeUpdate("INSERT INTO users(Name,Password,Salt) values ('" + this.userName + "','"+ this.password + "','" + this.salt + "');");
+        String hashPasswd = hashPassword();
+        PreparedStatement query = db.connection.prepareStatement("INSERT INTO users(Name,Password,Salt) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+        query.setString(1, this.userName);
+        query.setString(2, hashPasswd);
+        query.setString(3, toHex(this.salt));
+        query.executeUpdate();
 
-        // Setneme ID
-        ResultSet rs = db.st.executeQuery("SELECT ID FROM users WHERE name='"+ this.userName +"';");
-        this.id = rs.getInt("ID");
+        ResultSet rs = query.getGeneratedKeys();
+        if (rs.next()){
+            this.setId(rs.getInt(1));
+        }
     }
 
     public String getUserName() {
@@ -99,9 +164,9 @@ public class User {
     }
 
     private boolean makeUserDir(String directoryRoot) {
-        File dirToMake = new File(directoryRoot + File.separator + String.valueOf(this.id));
+        File dirToMake = new File(directoryRoot);
         if (!dirToMake.exists()) {
-            dirToMake.mkdir();
+            dirToMake.mkdirs();
         } else {
             // Directory uz existuje, nejaka picovina
             return false;

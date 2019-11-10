@@ -7,22 +7,17 @@ import java.io.File;
  */
 public class DirectoryManager {
 
-//    private String KEYDIR = "/usr/local/keys";
-//    private String UPLOADDIRECTORY = "/usr/local/uploads";
 
-    private static final String PROJECT_ROOT = "C:/Users/matus/IdeaProjects/java_webapp";
-    private static final String UPLOAD_ROOT = "C:/Users/matus/IdeaProjects/java_webapp/uploads";
-    private static final String KEYS_ROOT = "C:/Users/matus/IdeaProjects/java_webapp/keys";
 
-    public static String getProjectRoot(){
-        return PROJECT_ROOT;
-    }
+    private static final String UPLOAD_ROOT = "uploads";
+    private static final String KEYS_ROOT = "keys";
+
 
     public static String getUploadRoot(Object id){
-        return UPLOAD_ROOT + File.separator + (String) id + File.separator;
+        return UPLOAD_ROOT + File.separator + id.toString() + File.separator;
     }
 
     public static String getKeysRoot(Object id){
-        return KEYS_ROOT + File.separator + (String) id + File.separator;
+        return KEYS_ROOT + File.separator + id.toString() + File.separator;
     }
 }
