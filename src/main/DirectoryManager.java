@@ -19,10 +19,10 @@ public class DirectoryManager {
     }
 
     public static String getUploadRoot(Object id){
-        return UPLOAD_ROOT + File.separator + (String) id + File.separator;
+        return UPLOAD_ROOT + File.separator + id.toString() + File.separator;
     }
 
     public static String getKeysRoot(Object id){
-        return KEYS_ROOT + File.separator + (String) id + File.separator;
+        return KEYS_ROOT + File.separator + id.toString() + File.separator;
     }
 }
