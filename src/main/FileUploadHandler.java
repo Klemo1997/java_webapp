@@ -54,11 +54,13 @@ public class FileUploadHandler extends HttpServlet
                             item.write(keyFile);
                         } else {
                             String name = new File(item.getName()).getName();
+                            // Osetrime aby sa subor s rovnakym nazvom neprepisal, subor.txt sa nahradi suborom subor-new.txt
+                            name = fileNameIfExists(multiparts.get(2).getString().equals("enc"), name, session.getAttribute("userId").toString());
+
                             temp = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name);
                             item.write(temp);
                             encrypted = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name + ".enc");
                         }
-
                     }
                     else
                     {
@@ -75,7 +77,6 @@ public class FileUploadHandler extends HttpServlet
                     }
                 }
                 //File uploaded successfully
-
                 if (mode.equals("enc")) {
                     CryptoUtils.encrypt(keyFile,temp,encrypted);
                 } else if (mode.equals("dec")) {
@@ -83,8 +84,8 @@ public class FileUploadHandler extends HttpServlet
                 }
 
                 String fileName = mode.equals("enc")
-                    ? encrypted.getName()
-                    : encrypted.getName().replace(".enc", "");
+                        ? encrypted.getName()
+                        : encrypted.getName().replace(".enc", "");
 
                 OutputStream out = response.getOutputStream();
 
@@ -101,7 +102,7 @@ public class FileUploadHandler extends HttpServlet
                     out.write(buffer, 0, length);
                 }
                 // Neviem ci to s tymto funguje tak to pushnem aspon zakomentovane :D
-                if (!temp.delete()) {
+                if (mode.equals("enc") && !temp.delete()) {
                     throw new Exception("Temp file not deleted properly");
                 }
                 request.setAttribute("message","File Uploaded Successfully");
@@ -116,7 +117,6 @@ public class FileUploadHandler extends HttpServlet
                     response.sendRedirect(request.getContextPath() + "?error=1" );
                 }
             }
-
         }
         else
         {
@@ -127,5 +127,26 @@ public class FileUploadHandler extends HttpServlet
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	
+    }
+    /**
+     * Tu kontrolujeme ci uz subor s takym nazvom neexistuje, ak ano
+     * pridame mu k nazvu koncovku "-new", napr test.txt -> test-new.txt
+     *
+     * Funguje aj "rekurzivne", ak uz existuje aj test-new-new.txt, najde nazov
+     * text-new-new-new.txt
+     */
+    protected String fileNameIfExists(boolean isEnc, String name, String userid){
+        FileListManager flm = new FileListManager(userid);
+
+        if (!isEnc) {
+            return name;
+        }
+
+        while (flm.getUploads().get(name + ".enc") != null) {
+                String[] split = name.split("\\.");
+                split[0] = split[0] + "-new";
+                name = String.join(".", split);
+        }
+        return name;
     }
 }

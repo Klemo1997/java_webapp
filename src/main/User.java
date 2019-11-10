@@ -1,20 +1,21 @@
 package main;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Random;
 
 public class User {
 
@@ -172,5 +173,25 @@ public class User {
             return false;
         }
         return dirToMake.exists();
+    }
+
+
+    public boolean isPasswordSecure() throws IOException, Exception {
+        final String MIN_LENGHT="8";
+        final String MAX_LENGHT="20";
+
+        try (BufferedReader br = Files.newBufferedReader(Paths.get("xato-net-10-million-passwords.txt"), StandardCharsets.UTF_8)) {
+            for (String line = null; (line = br.readLine()) != null;) {
+                if (this.password.equals(line)){
+                    throw new Exception("password_in_dictionary");
+                }
+            }
+        }
+
+        // Regex, ktory zisti ci password obsahuje aspon 1 velke pismeno, aspon 1 male pismeno, cislo a ma 8-40 znakov
+        final String PASSWORD_SECURITY_PATTERN = "((?=.*[a-z])(?=.*\\d)(?=.*[A-Z]).{8,40})";
+        // Taktiez nesmie obsahovat medzery
+        return this.password.matches(PASSWORD_SECURITY_PATTERN)
+                && !this.password.contains(" ");
     }
 }

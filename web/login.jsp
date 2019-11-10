@@ -47,6 +47,9 @@
     <div class="alert alert-danger hidden error-flash" role="alert">
         Prihlasovacie meno alebo heslo je nesprávne
     </div>
+    <div class="alert alert-success hidden success-flash" role="alert">
+        Váš účet bol vytvorený, teraz sa môžete prihlásiť
+    </div>
 
     <div class="form-box text-center" align="center">
         <h2 class="display-5 mb-4"> Prihlásenie </h2>
@@ -80,9 +83,11 @@
     var url = new URL(window.location.href);
     if (url.searchParams.get('error') === "1") {
         $('.error-flash').show();
+    } if (url.searchParams.get('registration') === 'success') {
+        $('.success-flash').show();
     }
 
-    $('.error-flash').on('click', function () {
+    $('.error-flash, .success-flash').on('click', function () {
         $(this).fadeOut(400, function () {
             $(this).hide();
         });

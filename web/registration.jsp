@@ -15,6 +15,7 @@
     <title>Registruj sa</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
 <!-- Navbar -->
@@ -40,6 +41,9 @@
 
 
 <div class="container text-center mt-5">
+
+    <div class="alert alert-danger hidden error-flash" role="alert"></div>
+
 
     <div class="form-box text-center" align="center">
         <h2 class="display-5 mb-4"> Registrácia </h2>
@@ -88,46 +92,31 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script type="application/javascript">
-    $('input[type=radio][name=cryption-type]').on('change', function () {
-        var keystr = $(this).val() === 'enc'
-            ? 'Šifrovací kľúč'
-            : 'Dešifrovací kľúč';
+    var errorTexts = {
+        userexists   : "Tento používateľ už je zaregistrovaný",
+        passmismatch : "Heslá sa nezhodujú",
+        passinsec    : "Heslo nieje bezpečné. Uistite sa, že obsahuje aspoň 1 veľké písmeno, 1 malé písmeno a aspoň jednu číslicu a je v rozmedzí 8 až 40 znakov",
+        passindict   : "Vaše heslo nieje bezpečné, pretože bolo nájdené medzi nebezpečnými heslami nášho slovníka"
+    };
 
-        if ($(this).val() === 'enc') {
-            $('.only-enc-visible').removeClass('d-none');
-        } else if ($(this).val() === 'dec') {
-            $('.only-enc-visible').addClass('d-none');
-        }
+    var url = new URL(window.location.href);
+    if (url.searchParams.get('error') !== null) {
+        var errorType = url.searchParams.get('error');
 
-        $('#key-label').text(keystr);
-    })
-
-    $('#enable-generate').on('click', function () {
-        if ($('.generate-key-div').hasClass('d-none')) {
-            $('.generate-key-div').removeClass('d-none');
+        if (typeof errorTexts[errorType] !== "undefined") {
+            $('.error-flash').text(errorTexts[errorType])
         } else {
-            $('.generate-key-div').addClass('d-none');
+            $('.error-flash').text("Pri registrácii došlo k chybe, skúste to znova, prosím.")
         }
-    })
 
-    $('.generate-key-btn').on('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var key_bytes = $('#key-bits').val() / 8;
-        var rand_string = generateId(key_bytes);
-        $('#key').val(rand_string);
-    })
-
-    function dec2hex (dec) {
-        return ('0' + dec.toString(16)).substr(-2)
+        $('.error-flash').show();
     }
 
-    // generateId :: Integer -> String
-    function generateId (len) {
-        var arr = new Uint8Array((len || 40) / 2)
-        window.crypto.getRandomValues(arr)
-        return Array.from(arr, dec2hex).join('')
-    }
+    $('.error-flash').on('click', function () {
+        $(this).fadeOut(400, function () {
+            $(this).hide();
+        });
+    });
 
 </script>
 </body>

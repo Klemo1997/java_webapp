@@ -14,11 +14,17 @@ public class RegistrationServlet extends HttpServlet {
             user.setUser(request.getParameter("user_login"), request.getParameter("user_password"));
 
             if (user.checkUser(user.getUserName())) {
-                throw new Exception("User already exist");
+                throw new Exception("user_exists");
             }
-            if(!user.checkPasswords(request.getParameter("user_password"),request.getParameter("user_password_check"))){
-                throw new Exception("Password does not match");
+
+            if (!user.checkPasswords(request.getParameter("user_password"),request.getParameter("user_password_check"))) {
+                throw new Exception("password_not_match");
             }
+
+            if (!user.isPasswordSecure()) {
+                throw new Exception("password_insecure");
+            }
+
             //spravit salt a nahradit
             user.registerUser();
             // Setneme userovi priecinky
@@ -26,12 +32,28 @@ public class RegistrationServlet extends HttpServlet {
                 throw new Exception("Failed while creating user directories");
             }
 
-            response.sendRedirect("index.jsp");
+            response.sendRedirect("login.jsp?registration=success");
 
         } catch (Exception e) {
-            response.sendRedirect("login.jsp?error=1");
+            String errorType = null;
+            switch(e.getMessage()) {
+                case "user_exists":
+                    errorType = "userexists";
+                    break;
+                case "password_not_match":
+                    errorType = "passmismatch";
+                    break;
+                case "password_insecure":
+                    errorType = "passinsec";
+                    break;
+                case "password_in_dictionary":
+                    errorType = "passindict";
+                    break;
+                default:
+                    errorType = "1";
+            }
+            response.sendRedirect("registration.jsp?error=" + errorType);
         }
-
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
