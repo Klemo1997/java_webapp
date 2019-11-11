@@ -30,10 +30,10 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/login.jsp"><i class="fas fa-sign-in-alt"></i> Prihlásenie</a>
+                    <a class="nav-link" href="login.jsp"><i class="fas fa-sign-in-alt"></i> Prihlásenie</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/registration.jsp"><i class="fas fa-user-plus"></i> Registrácia</a>
+                    <a class="nav-link" href="registration.jsp"><i class="fas fa-user-plus"></i> Registrácia</a>
                 </li>
             </ul>
         </div>
