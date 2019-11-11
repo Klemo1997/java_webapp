@@ -177,8 +177,8 @@ public class User {
 
 
     public boolean isPasswordSecure() throws IOException, Exception {
-        final String MIN_LENGHT="8";
-        final String MAX_LENGHT="20";
+        final int MIN_LENGHT = 8;
+        final int MAX_LENGHT = 40;
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get("xato-net-10-million-passwords.txt"), StandardCharsets.UTF_8)) {
             for (String line = null; (line = br.readLine()) != null;) {
@@ -187,9 +187,8 @@ public class User {
                 }
             }
         }
-
         // Regex, ktory zisti ci password obsahuje aspon 1 velke pismeno, aspon 1 male pismeno, cislo a ma 8-40 znakov
-        final String PASSWORD_SECURITY_PATTERN = "((?=.*[a-z])(?=.*\\d)(?=.*[A-Z]).{8,40})";
+        final String PASSWORD_SECURITY_PATTERN = String.format("((?=.*[a-z])(?=.*\\d)(?=.*[A-Z]).{%d,%d})", MIN_LENGHT, MAX_LENGHT);
         // Taktiez nesmie obsahovat medzery
         return this.password.matches(PASSWORD_SECURITY_PATTERN)
                 && !this.password.contains(" ");

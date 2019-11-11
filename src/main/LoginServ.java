@@ -11,7 +11,7 @@ public class LoginServ extends HttpServlet {
 
         try {
             User user = new User();
-            user.setUser(request.getParameter("user_login"), request.getParameter("user_password"));
+            user.setUser(request.getParameter("user_login").trim(), request.getParameter("user_password"));
 
             if (!user.verify()) {
                 throw new Exception("Wrong data for login");

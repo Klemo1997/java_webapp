@@ -7,12 +7,14 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-
+    if (session.getAttribute("userId") != null) {
+        response.sendRedirect("index.jsp");
+    }
 %>
 <html>
 <head>
     <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
-    <title>Registruj sa</title>
+    <title>Registrácia</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="main.css">
@@ -63,7 +65,7 @@
                 <input type="password" id="passwordcheck" class="form-control" placeholder="Heslo" name="user_password_check" required>
             </div>
             <div class="input-group input-group-sm my-2">
-                <input type="submit" class="btn btn-primary btn-block" value="Registruj sa">
+                <input type="submit" class="btn btn-primary btn-block" value="Vytvoriť">
             </div>
 
         </form>

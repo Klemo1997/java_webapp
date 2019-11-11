@@ -15,7 +15,7 @@ public class RegistrationServlet extends HttpServlet {
 
         try {
             User user = new User();
-            user.setUser(request.getParameter("user_login"), request.getParameter("user_password"));
+            user.setUser(request.getParameter("user_login").trim(), request.getParameter("user_password"));
 
             if (user.checkUser(user.getUserName())) {
                 throw new Exception("user_exists");
