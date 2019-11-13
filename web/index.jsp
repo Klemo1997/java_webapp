@@ -56,13 +56,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded"><i class="fas fa-upload"></i> Nahrať súbor</a>
+                    <a class="nav-link" href=""><i class="fas fa-upload"></i> Nahrať súbor</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/files.jsp"><i class="fas fa-folder"></i> Moje súbory</a>
+                    <a class="nav-link" href="files.jsp"><i class="fas fa-folder"></i> Moje súbory</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/key_manager.jsp"><i class="fas fa-key"></i> Pregenerovať kľúče</a>
+                    <a class="nav-link" href="key_manager.jsp"><i class="fas fa-key"></i> Pregenerovať kľúče</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -70,7 +70,7 @@
                     Prihlásený ako: <%= userName %>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/java_webapp_war_exploded/logout"><i class="fas fa-power-off"></i> Odhlásiť sa</a>
+                    <a class="nav-link" href="logout"><i class="fas fa-power-off"></i> Odhlásiť sa</a>
                 </li>
             </ul>
         </div>

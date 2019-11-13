@@ -2,8 +2,12 @@ package main;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 
 @WebServlet(name = "RegServ")
 public class RegistrationServlet extends HttpServlet {
@@ -11,7 +15,7 @@ public class RegistrationServlet extends HttpServlet {
 
         try {
             User user = new User();
-            user.setUser(request.getParameter("user_login"), request.getParameter("user_password"));
+            user.setUser(request.getParameter("user_login").trim(), request.getParameter("user_password"));
 
             if (user.checkUser(user.getUserName())) {
                 throw new Exception("user_exists");
@@ -52,6 +56,10 @@ public class RegistrationServlet extends HttpServlet {
                 default:
                     errorType = "1";
             }
+            File file = new File("test.log");
+            PrintStream ps = new PrintStream(file);
+            e.printStackTrace(ps);
+
             response.sendRedirect("registration.jsp?error=" + errorType);
         }
     }

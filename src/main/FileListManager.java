@@ -45,7 +45,8 @@ public class FileListManager {
         }
 
         for (String item : uploads) {
-            String itemName = item.substring(item.lastIndexOf("\\") + 1);
+            String[] pathSplit = item.replace('\\','/').split("/");
+            String itemName = pathSplit[pathSplit.length - 1];
             if (itemName.contains(".enc")) {
                 fileMap.put(itemName, item.replace("\\", "/"));
             } else {
@@ -73,7 +74,8 @@ public class FileListManager {
         }
 
         for (String item : uploads) {
-            String itemName = item.substring(item.lastIndexOf("\\") + 1);
+            String[] pathSplit = item.replace('\\','/').split("/");
+            String itemName = pathSplit[pathSplit.length - 1];
             if (!itemName.contains("tempKey")){
                 fileMap.put(itemName, item.replace("\\", "/"));
             }
