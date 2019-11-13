@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,19 +20,28 @@ public class FileListManager {
         this.userId = userId;
     }
 
-    public  Map<String, String> getUploads(){
+    public  Map<String, String> getUploads(FileFilter filter) throws SQLException, ClassNotFoundException {
+        if (filter == null) {
+            filter = new FileFilter(false, false, null, false);
+        }
+
         Map<String, String> fileMap = new HashMap<String, String>();
 
         List<String> uploads = new ArrayList<>();
 
-        try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getUploadRoot(this.userId)))) {
+        if (filter.isDisabled) {
+            try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getUploadRoot(this.userId)))) {
 
-            uploads = walk.filter(Files::isRegularFile)
-                    .map(x -> x.toString()).collect(Collectors.toList());
+                uploads = walk.filter(Files::isRegularFile)
+                        .map(x -> x.toString()).collect(Collectors.toList());
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+           filter.setUserId(this.userId);
+           uploads = filter.doFiltration();
         }
 
         for (String item : uploads) {
@@ -64,6 +74,37 @@ public class FileListManager {
 
         for (String item : uploads) {
             String itemName = item.substring(item.lastIndexOf("\\") + 1);
+            if (!itemName.contains("tempKey")){
+                fileMap.put(itemName, item.replace("\\", "/"));
+            }
+        }
+        return fileMap;
+    }
+
+    public  Map<String, String> getAllUploads(FileFilter filter) throws SQLException, ClassNotFoundException {
+
+
+        Map<String, String> fileMap = new HashMap<String, String>();
+
+        List<String> uploads = new ArrayList<>();
+
+        if (filter.isDisabled) {
+            try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getAllUploadsRoot()))) {
+
+                uploads = walk.filter(Files::isRegularFile)
+                        .map(x -> x.toString()).collect(Collectors.toList());
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            uploads = filter.doFiltration();
+        }
+
+        for (String item : uploads) {
+            String[] pathSplit = item.replace('\\','/').split("/");
+            String itemName = pathSplit[pathSplit.length - 1];
             if (!itemName.contains("tempKey")){
                 fileMap.put(itemName, item.replace("\\", "/"));
             }

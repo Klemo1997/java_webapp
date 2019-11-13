@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.sql.SQLException;
 import java.util.List;
 
 public class FileUploadHandler extends HttpServlet
@@ -59,7 +60,11 @@ public class FileUploadHandler extends HttpServlet
 
                             temp = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name);
                             item.write(temp);
-                            encrypted = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name + ".enc");
+                            String encryptedAppend = multiparts.get(2).getString().equals("enc") ? "enc" : "";
+                            encrypted = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + name +  encryptedAppend);
+                            if (encrypted.exists()) {
+
+                            }
                         }
                     }
                     else
@@ -87,11 +92,13 @@ public class FileUploadHandler extends HttpServlet
                         ? encrypted.getName()
                         : encrypted.getName().replace(".enc", "");
 
-                OutputStream out = response.getOutputStream();
+                // Pridame file do databazy
+                DbHandler db = new DbHandler();
+                db.AddFile(encrypted, session.getAttribute("userId").toString());
 
+                OutputStream out = response.getOutputStream();
                 response.setContentType("application/x-msdownload");
                 response.setHeader("Content-Disposition", "attachment; filename=" +  fileName);
-
 
                 FileInputStream in = new FileInputStream(encrypted);
 
@@ -135,14 +142,10 @@ public class FileUploadHandler extends HttpServlet
      * Funguje aj "rekurzivne", ak uz existuje aj test-new-new.txt, najde nazov
      * text-new-new-new.txt
      */
-    protected String fileNameIfExists(boolean isEnc, String name, String userid){
+    protected String fileNameIfExists(boolean isEnc, String name, String userid) throws SQLException, ClassNotFoundException {
         FileListManager flm = new FileListManager(userid);
-
-        if (!isEnc) {
-            return name;
-        }
-
-        while (flm.getUploads().get(name + ".enc") != null) {
+        name = isEnc ? name + ".enc" : name;
+        while (flm.getUploads(null).get(name) != null) {
                 String[] split = name.split("\\.");
                 split[0] = split[0] + "-new";
                 name = String.join(".", split);

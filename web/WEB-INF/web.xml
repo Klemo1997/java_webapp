@@ -91,4 +91,14 @@
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
      <!--mapping-->
+
+    <servlet>
+        <servlet-name>FileDetail</servlet-name>
+        <servlet-class>main.FileDetailViewer</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileDetail</servlet-name>
+        <url-pattern>/files/view</url-pattern>
+    </servlet-mapping>
+     <!--mapping-->
 </web-app>

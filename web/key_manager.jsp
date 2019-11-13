@@ -36,6 +36,9 @@
         }
     }
 
+    if (userName == null) {
+        //todo: tu musime osetrit "Prihlaseny ako null" bug
+    }
     Map<String, String> keysFiles = null;
 
     if (userId != null) {

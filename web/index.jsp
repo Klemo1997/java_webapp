@@ -28,6 +28,10 @@
         }
     }
 
+    if (userName == null) {
+        // todo: tu musime osetrit "Prihlaseny ako null" bug
+    }
+
 %>
 
 

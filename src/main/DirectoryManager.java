@@ -20,4 +20,8 @@ public class DirectoryManager {
     public static String getKeysRoot(Object id){
         return KEYS_ROOT + File.separator + id.toString() + File.separator;
     }
+
+    public static String getAllUploadsRoot() {
+        return UPLOAD_ROOT + File.separator;
+    }
 }
