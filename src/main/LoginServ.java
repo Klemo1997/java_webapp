@@ -4,20 +4,34 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.Date;
 
 @WebServlet(name = "LoginServ")
 public class LoginServ extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        int badLoginCount = session.getAttribute("badLoginAttempt") != null
+                ? (int)session.getAttribute("badLoginAttempt")
+                : 0;
 
         try {
             User user = new User();
             user.setUser(request.getParameter("user_login").trim(), request.getParameter("user_password"));
 
+            boolean isLocked = badLoginCount + 1 >= 3;
+
+            if (session.getAttribute("unlockTime") != null) {
+                isLocked = isLocked && (Long)new Date().getTime() < (Long)session.getAttribute("unlockTime");
+            }
+
+            if (isLocked) {
+                throw new Exception("attempts_exceeded");
+            }
+
             if (!user.verify()) {
                 throw new Exception("Wrong data for login");
             }
 
-            HttpSession session = request.getSession();
 
             session.setAttribute("userId", String.valueOf(user.getId()));
 
@@ -36,6 +50,16 @@ public class LoginServ extends HttpServlet {
             response.sendRedirect("index.jsp");
 
         } catch (Exception e) {
+            // Prekrocene pokusy o prihlasenie, odstavili sme usera na 5 minut
+            if (e.getMessage().equals("attempts_exceeded")) {
+                if (session.getAttribute("unlockTime") == null) {
+                    session.setAttribute("unlockTime", session.getLastAccessedTime() + session.getMaxInactiveInterval() * 1000);
+                }
+                response.sendRedirect("login.jsp?error=attemptsexceeded");
+                return;
+            }
+            session.setMaxInactiveInterval(5*60);
+            session.setAttribute("badLoginAttempt", ++badLoginCount);
             response.sendRedirect("login.jsp?error=1");
         }
 

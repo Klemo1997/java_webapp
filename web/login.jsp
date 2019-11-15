@@ -83,7 +83,12 @@
     var url = new URL(window.location.href);
     if (url.searchParams.get('error') === "1") {
         $('.error-flash').show();
-    } if (url.searchParams.get('registration') === 'success') {
+    } else if (url.searchParams.get('error') === "attemptsexceeded") {
+        $('.error-flash').text('Vyčerpali ste limit neúspešných pokusov o prihlásenie, skúste to znovu o 5 minút, prosím');
+        $('.error-flash').show();
+    }
+
+    if (url.searchParams.get('registration') === 'success') {
         $('.success-flash').show();
     }
 
