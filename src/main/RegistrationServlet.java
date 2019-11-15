@@ -59,7 +59,6 @@ public class RegistrationServlet extends HttpServlet {
             File file = new File("test.log");
             PrintStream ps = new PrintStream(file);
             e.printStackTrace(ps);
-
             response.sendRedirect("registration.jsp?error=" + errorType);
         }
     }

@@ -19,7 +19,7 @@ public class DbHandler {
 
     public DbHandler() throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ubp_db","root","");//JumpUpAndDown
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ubp_db","root","JumpUpAndDown");
     }
 
     public boolean AddFile (File file, String uploadedBy) throws IOException, SQLException {
