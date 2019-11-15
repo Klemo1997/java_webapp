@@ -1,5 +1,6 @@
 package main;
 
+import com.mysql.jdbc.exceptions.MySQLDataException;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 
 import java.io.File;
@@ -72,7 +73,9 @@ public class DbHandler {
 
         try {
             ResultSet resultSet = query.executeQuery();
-            String[] wantedColumns = filter.wantedColumns;
+            String[] wantedColumns = filter.wantedColumns != null
+                    ? filter.wantedColumns
+                    : new String[]{"id_file", "filename", "path", "mime_type", "owner_id"};
 
             while (resultSet.next()) {
 
@@ -149,19 +152,21 @@ public class DbHandler {
         String[] owners = null;
 
 
-        if (filter.searchAuthorNames) {
-            author_query = " owner_id IN (";
-            owners = getUsersLike(filter.searchQuery);
-            for (int i = 0; i < owners.length; i++) {
-                if (i != owners.length - 1) {
-                    author_query += " ?,";
-                } else {
-                    author_query += " ? )";
+        if (!filter.isDisabled) {
+            if (filter.searchAuthorNames) {
+                author_query = " owner_id IN (";
+                owners = getUsersLike(filter.searchQuery);
+                for (int i = 0; i < owners.length; i++) {
+                    if (i != owners.length - 1) {
+                        author_query += " ?,";
+                    } else {
+                        author_query += " ? )";
+                    }
                 }
             }
-        }
-        if (filter.searchFileNames) {
-            name_query = " filename LIKE ? ";
+            if (filter.searchFileNames) {
+                name_query = " filename LIKE ? ";
+            }
         }
         // Hladame konkretneho usera (mozme mu ale filtrovat fily podla mena)
         if (filter.userId != null) {
@@ -173,13 +178,14 @@ public class DbHandler {
             author_query = "";
         }
 
-        // Oddelime podmienky ANDom
-        String condition_separator = !author_query.equals("") && !name_query.equals("") ? " OR " : "";
+        // Oddelime podmienky
+        String condition_separator = !author_query.equals("") && !name_query.equals("")
+            ? filter.allFiles ? " OR " : " AND "
+            : "";
 
         String queryString = filter.allFiles && filter.isDisabled
             ? "SELECT * FROM files"
             : "SELECT * FROM files WHERE " + author_query + condition_separator + name_query;
-
 
         PreparedStatement query = connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
         int parameterIndex = 1;
@@ -190,12 +196,12 @@ public class DbHandler {
             }
         }
 
-        if (filter.userId != null) {
+        if (filter.userId != null && !filter.allFiles) {
             query.setString(parameterIndex, filter.userId);
             parameterIndex++;
         }
 
-        if (filter.searchFileNames) {
+        if (filter.searchFileNames && !filter.isDisabled) {
             query.setString(parameterIndex, "%" + filter.searchQuery + "%");
         }
 
@@ -256,6 +262,45 @@ public class DbHandler {
             }
         }
         return 0;
+    }
+
+    public void add(String queryString, ArrayList<String> values) throws SQLException, ClassNotFoundException {
+        DbHandler db = new DbHandler();
+
+        PreparedStatement query = db.connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
+        int paramCount = 1;
+        for (String val : values) {
+            query.setString(paramCount, val);
+            paramCount++;
+        }
+        query.executeUpdate();
+    }
+
+    public ArrayList<HashMap<String, String>> get(String queryString, ArrayList<String> values, String[] columns)
+            throws SQLException, ClassNotFoundException, Exception {
+        DbHandler db = new DbHandler();
+
+        PreparedStatement query = db.connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
+        int paramCount = 1;
+        for (String val : values) {
+            query.setString(paramCount, val);
+            paramCount++;
+        }
+        ResultSet rs = query.executeQuery();
+        ArrayList<HashMap<String, String>> records = new ArrayList<>();
+
+        while (rs.next()) {
+            HashMap<String, String> record = new HashMap<String, String>();
+
+            for (String col : columns) {
+                if (rs.getString(col) == null) {
+                    throw new MySQLDataException("Corrupted data");
+                }
+                record.put(col, rs.getString(col));
+            }
+            records.add(record);
+        }
+        return records;
     }
 
 }

@@ -3,6 +3,7 @@
 <%@ page import="main.User" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="main.PermissionHandler" %>
 <%--
   Created by IntelliJ IDEA.
   User: matus
@@ -139,21 +140,22 @@
     <div class="container text-center border border-primary mt-1">
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
-                <% if (uploadfiles != null) { %>
-                    <% for (String file_id : uploadfiles.keySet()) { %>
-                    <li class="list-group-item">
-                        <a href="view.jsp?id=<%= file_id %>">
-                            <%=uploadfiles.get(file_id).get("filename")%>
-                            <small class="user-name-filelist text-muted"><%= !uploadfiles.get(file_id).get("owner_id").equals(userId) ? "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" : "" %></small>
-                        </a>
-                        <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
-                        <a href="download/<%=uploadfiles.get(file_id).get("filename")%>" class="to-right" type="submit">
+
+            <% if (uploadfiles != null) { %>
+                <% for (String file_id : uploadfiles.keySet()) { %>
+                <li class="list-group-item">
+                    <a href="view.jsp?id=<%= file_id %>">
+                        <%=uploadfiles.get(file_id).get("filename")%>
+                        <small class="user-name-filelist text-muted"><%= !uploadfiles.get(file_id).get("owner_id").equals(userId) ? "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" : "" %></small>
+                    </a>
+                    <% if(PermissionHandler.canAccess(userId, file_id)) { %>
+                        <a href="download/<%=file_id%>" class="to-right" type="submit">
                              <i class="fas fa-download"></i>
                         </a>
-                        <% } %>
-                    </li>
-                    <% } %>
+                    <%  } %>
+                </li>
                 <% } %>
+            <% } %>
         </ul>
     </div>
 

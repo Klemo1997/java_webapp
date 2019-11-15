@@ -86,6 +86,12 @@ public class FileFilter {
         if (this.searchQuery == null || this.searchQuery.equals("")) {
             this.isDisabled = true;
         }
+
+        if (this.isDisabled) {
+            this.searchFileNames = false;
+            this.searchAuthorNames = false;
+        }
+
         if (this.allFiles) {
             //Chceme vsetky fily,
             //userId preto musime unsetnut

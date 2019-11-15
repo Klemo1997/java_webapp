@@ -37,7 +37,7 @@
         <servlet-name>TestServlet</servlet-name>
         <jsp-file>/files.jsp</jsp-file>
     </servlet>
-    <!--mapping-->
+
     <servlet-mapping>
         <servlet-name>TestServlet</servlet-name>
         <url-pattern>/files.jsp</url-pattern>
@@ -47,7 +47,7 @@
         <servlet-name>KeyManager</servlet-name>
         <jsp-file>/key_manager.jsp</jsp-file>
     </servlet>
-    <!--mapping-->
+
     <servlet-mapping>
         <servlet-name>KeyManager</servlet-name>
         <url-pattern>/key_manager.jsp</url-pattern>
@@ -57,7 +57,7 @@
         <servlet-name>KeyGenerator</servlet-name>
         <servlet-class>main.KeysRegenerateServlet</servlet-class>
     </servlet>
-    <!--mapping-->
+
     <servlet-mapping>
         <servlet-name>KeyGenerator</servlet-name>
         <url-pattern>/keys_regenerate</url-pattern>
@@ -67,7 +67,7 @@
         <servlet-name>LoginServ</servlet-name>
         <servlet-class>main.LoginServ</servlet-class>
     </servlet>
-    <!--mapping-->
+
     <servlet-mapping>
         <servlet-name>LoginServ</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -77,7 +77,7 @@
         <servlet-name>LogoutServ</servlet-name>
         <servlet-class>main.LogoutServ</servlet-class>
     </servlet>
-    <!--mapping-->
+
     <servlet-mapping>
         <servlet-name>LogoutServ</servlet-name>
         <url-pattern>/logout</url-pattern>
@@ -90,7 +90,7 @@
         <servlet-name>RegServ</servlet-name>
         <url-pattern>/register</url-pattern>
     </servlet-mapping>
-     <!--mapping-->
+
 
     <servlet>
         <servlet-name>CommentsHandler</servlet-name>
@@ -100,5 +100,16 @@
         <servlet-name>CommentsHandler</servlet-name>
         <url-pattern>/comments/*</url-pattern>
     </servlet-mapping>
-     <!--mapping-->
+
+    <servlet>
+        <servlet-name>PermissionsHandler</servlet-name>
+        <servlet-class>main.PermissionServ</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PermissionsHandler</servlet-name>
+        <url-pattern>/permission/*</url-pattern>
+    </servlet-mapping>
+
+
+
 </web-app>

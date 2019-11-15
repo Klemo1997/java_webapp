@@ -1,9 +1,6 @@
-<%@ page import="main.FileFilter" %>
-<%@ page import="main.FileListManager" %>
-<%@ page import="main.User" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="main.CommentsHandler" %>
+<%@ page import="main.*" %>
 <%--
   Created by IntelliJ IDEA.
   User: matus
@@ -44,10 +41,6 @@
         }
     }
 
-    if (userName == null) {
-
-    }
-
     String fileId = request.getParameter("id");
     FileFilter filter = new FileFilter(fileId);
 
@@ -60,6 +53,11 @@
             response.sendRedirect("/files.jsp?err=filenotfound");
         }
     }
+    ArrayList<HashMap<String, String>> unacceptedRequests = null;
+    if (fileData.get("owner_id").equals(userId)) {
+        unacceptedRequests = PermissionHandler.getRequestsForFile(fileId, false);
+    }
+
 
     // Vytiahneme komentare
     ArrayList<HashMap<String,String>> comments = CommentsHandler.getCommentsByFile(fileId);
@@ -105,6 +103,13 @@
     </nav>
 
     <div class="container">
+
+        <div class="alert alert-danger hidden error-flash text-center" role="alert">
+            Chyba
+        </div>
+        <div class="alert alert-success hidden success-flash text-center" role="alert">
+        </div>
+
         <div class="card text-center">
             <div class="card-header">
                 <h1> Detail súboru : </h1>
@@ -124,10 +129,44 @@
                 </ul>
 
                 <% if (fileData.get("owner_id").equals(userId)) { %>
-                     <a href="download/<%= fileId %>" class="btn btn-primary disabled">Stiahnuť súbor</a>
+                     <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a>
+
+                    <div class="permission-request-container mt-4" style="margin: auto; width: 200px;">
+                        <% if (unacceptedRequests != null) { %>
+                        <h4>Žiadosti o prístup</h4>
+                            <% for (HashMap<String, String> permission : unacceptedRequests) { %>
+
+                                <div class="my-1">
+                                    <form name="accept-permission" method="post" action="/permission/accept">
+
+                                        <div style="float:left; line-height: 30px;">Žiadosť od : <strong class="text-success"><%= User.getNameById(permission.get("to_id")) %></strong></div>
+                                        <div style="float:right">
+                                            <input type="hidden" name="permission-id" value="<%= permission.get("id_p") %>" required></input>
+                                            <button class="btn btn-outline-success"><i class="far fa-thumbs-up"></i></button>
+                                        </div>
+                                    </form>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
                 <% } else { %>
-                    <p class="card-text">Ku tomuto súboru nemáte prístup</p>
-                    <a href="#" class="btn btn-primary disabled">Požiadať o povolenie k prístupu</a>
+                    <% if (PermissionHandler.canAccess(userId, fileId)) { %>
+                        <p class="card-text">K tomuto súboru máte udelený prístup</p>
+                        <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a>
+                    <% } else { %>
+                        <p class="card-text">K tomuto súboru nemáte prístup</p>
+                        <% if (
+                               PermissionHandler.getRequestStatus(userId, fileId) != null &&
+                               PermissionHandler.getRequestStatus(userId, fileId).get("granted").equals("0")
+                        ) { %>
+                            <p class="text-danger">Čaká sa na potvrdenie vlastníka</p>
+                        <% } else { %>
+                        <form name="request-file" method="post" action="permission/request">
+                            <input type="hidden" name="file-id" value="<%= fileId %>" required>
+                            <button type="submit" class="btn btn-primary">Požiadať o povolenie k prístupu</button>
+                        </form>
+                        <% } %>
+                    <% } %>
                 <% } %>
             </div>
             <div class="card-footer text-muted"></div>
@@ -172,4 +211,32 @@
         </div>
     </div>
 </body>
+
+<script
+        src="http://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script type="application/javascript">
+    var url = new URL(window.location.href);
+    if (['requestfailed', 'acceptfailed'].includes(url.searchParams.get('error'))) {
+        $('.error-flash').show();
+    } else if (url.searchParams.get('permission') === "accepted") {
+        $('.success-flash').text('Práve ste udelili používateľovi prístup k vášmu súboru');
+        $('.success-flash').show();
+    } else if (url.searchParams.get('permission') === 'requested') {
+        $('.success-flash').text('Žiadosť o prístup bola odoslaná');
+        $('.success-flash').show();
+    } else if (url.searchParams.get('success') === 'comment') {
+        $('.success-flash').text('Komentár bol pridaný');
+        $('.success-flash').show();
+    }
+
+    $('.error-flash, .success-flash').on('click', function () {
+        $(this).fadeOut(400, function () {
+            $(this).hide();
+        });
+    });
+</script>
 </html>
