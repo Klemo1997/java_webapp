@@ -1,14 +1,8 @@
-<%@ page import="java.nio.file.Files" %>
-<%@ page import="java.nio.file.Path" %>
-<%@ page import="java.nio.file.Paths" %>
-<%@ page import="java.util.stream.Stream" %>
+<%@ page import="main.FileFilter" %>
 <%@ page import="main.FileListManager" %>
-<%@ page import="java.util.List" %>
+<%@ page import="main.User" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="main.FileListManager" %>
-<%@ page import="java.nio.file.FileSystems" %>
-<%@ page import="main.FileFilter" %>
 <%--
   Created by IntelliJ IDEA.
   User: matus
@@ -60,18 +54,12 @@
             request.getParameter("file_query"),
             request.getParameter("files_selector") != null && request.getParameter("files_selector").equals("allfiles")
     );
-    if (request.getParameter("file_query") != null) {
 
-    }
-
-
-    Map<String, String> uploadfiles = null;
+    HashMap<String, Map<String, String>> uploadfiles = null;
 
     if (userId != null) {
         FileListManager flm = new FileListManager(userId);
-        uploadfiles = !filter.allFiles
-            ? flm.getUploads(filter)
-            : flm.getAllUploads(filter);
+        uploadfiles = flm.getUploads(filter);
     }
 %>
 
@@ -131,6 +119,7 @@
             <div class="border border-primary my-3 p-5">
             <input class="form-control mr-sm-2" type="search" placeholder="Vyhľadať..." aria-label="Search" name="file_query"
                 <%= request.getParameter("file_query") != null ? "value='" + request.getParameter("file_query") + "'" : "" %> >
+                    <small class="text-muted my-2"><i class="fas fa-info"></i> Pre vyhľadanie súborov podľa autora alebo názvu musí byť zaškrtnuté aspoň jedno políčko.</small>
                 <div class="custom-control custom-checkbox mr-sm-2">
                     <input type="checkbox" class="custom-control-input" id="customControlAutosizing" name="search_by_names" <%= request.getParameter("search_by_names") != null && request.getParameter("search_by_names").equals("on") ? "checked" : ""  %> >
                     <label class="custom-control-label" for="customControlAutosizing">Vyhľadať podľa názvu</label>
@@ -139,22 +128,26 @@
                     <input type="checkbox" class="custom-control-input" id="customControlAutosizing2" name="search_by_authors" <%= request.getParameter("search_by_authors") != null && request.getParameter("search_by_authors").equals("on") ? "checked" : ""  %> >
                     <label class="custom-control-label" for="customControlAutosizing2">Vyhľadať podľa autora</label>
                 </div>
-                <small class="text-muted"><i class="fas fa-info"></i> Pre vyhľadanie súborov podľa  musí byť zaškrtnuté aspoň jedno políčko.</small>
+
             </div>
             <button class="btn btn-outline-success my-2 my-sm-0 search-file-btn" type="submit">Vyhľadaj súbor</button>
         </form>
     </div>
 
-    <div class="container text-center border border-primary">
+    <div class="container text-center mb-0"><small class="text-muted mt-2"><i class="fas fa-info"></i> V zátvorke pri cudzích súboroch sa nachádza meno vlastníka súboru </small></div>
 
+    <div class="container text-center border border-primary mt-1">
         <ul class="list-group list-group-flush">
             <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
                 <% if (uploadfiles != null) { %>
-                    <% for (Map.Entry<String,String> entry : uploadfiles.entrySet()) { %>
+                    <% for (String file_id : uploadfiles.keySet()) { %>
                     <li class="list-group-item">
-                        <a href="files/view/<%= entry.getValue() %>"><%=entry.getKey()%></a>
-                        <% if (entry.getValue().split("/")[1].equals(userId)) { %>
-                        <a href="download/<%=entry.getKey()%>" class="to-right" type="submit">
+                        <a href="view.jsp?id=<%= file_id %>">
+                            <%=uploadfiles.get(file_id).get("filename")%>
+                            <small class="user-name-filelist text-muted"><%= !uploadfiles.get(file_id).get("owner_id").equals(userId) ? "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" : "" %></small>
+                        </a>
+                        <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
+                        <a href="download/<%=uploadfiles.get(file_id).get("filename")%>" class="to-right" type="submit">
                              <i class="fas fa-download"></i>
                         </a>
                         <% } %>

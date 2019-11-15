@@ -1,6 +1,6 @@
 package main;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,42 +20,13 @@ public class FileListManager {
         this.userId = userId;
     }
 
-    public  Map<String, String> getUploads(FileFilter filter) throws SQLException, ClassNotFoundException {
+    public  HashMap<String, Map<String, String>> getUploads(FileFilter filter) throws SQLException, ClassNotFoundException, FileNotFoundException {
         if (filter == null) {
             filter = new FileFilter(false, false, null, false);
         }
-
-        Map<String, String> fileMap = new HashMap<String, String>();
-
-        List<String> uploads = new ArrayList<>();
-
-        if (filter.isDisabled) {
-            try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getUploadRoot(this.userId)))) {
-
-                uploads = walk.filter(Files::isRegularFile)
-                        .map(x -> x.toString()).collect(Collectors.toList());
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-           filter.setUserId(this.userId);
-           uploads = filter.doFiltration();
-        }
-
-        for (String item : uploads) {
-            String[] pathSplit = item.replace('\\','/').split("/");
-            String itemName = pathSplit[pathSplit.length - 1];
-            if (itemName.contains(".enc")) {
-                fileMap.put(itemName, item.replace("\\", "/"));
-            } else {
-                File file = new File(itemName);
-                file.delete();
-            }
-
-        }
-        return fileMap;
+        //Ak vyberame vsetky fily, unsetneme ho vo filtri
+        filter.setUserId(userId);
+        return filter.doFiltrationV2();
     }
 
     public  Map<String, String> getKeys(){
@@ -83,36 +54,14 @@ public class FileListManager {
         return fileMap;
     }
 
-    public  Map<String, String> getAllUploads(FileFilter filter) throws SQLException, ClassNotFoundException {
+    public HashMap<String, HashMap<String, String>> getCompleteInfo(FileFilter filter) throws FileNotFoundException, SQLException, ClassNotFoundException {
 
+        HashMap<String, String> fileInfo = new HashMap<>();
+        fileInfo = filter.doCompleteInfoFiltration();
 
-        Map<String, String> fileMap = new HashMap<String, String>();
+        HashMap<String, HashMap<String, String>> fileMap = new HashMap<>();
+        fileMap.put(filter.fileId, fileInfo);
 
-        List<String> uploads = new ArrayList<>();
-
-        if (filter.isDisabled) {
-            try (Stream<Path> walk = Files.walk(Paths.get(DirectoryManager.getAllUploadsRoot()))) {
-
-                uploads = walk.filter(Files::isRegularFile)
-                        .map(x -> x.toString()).collect(Collectors.toList());
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            uploads = filter.doFiltration();
-        }
-
-        for (String item : uploads) {
-            String[] pathSplit = item.replace('\\','/').split("/");
-            String itemName = pathSplit[pathSplit.length - 1];
-            if (!itemName.contains("tempKey")){
-                fileMap.put(itemName, item.replace("\\", "/"));
-            }
-        }
         return fileMap;
     }
-
-
 }

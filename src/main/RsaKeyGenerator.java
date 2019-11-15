@@ -22,7 +22,6 @@ public class RsaKeyGenerator {
     private SecretKeySpec secretKey;
 
 	public RsaKeyGenerator() throws NoSuchAlgorithmException, NoSuchPaddingException {
-		// TODO Auto-generated constructor stub
 		this.cipher = Cipher.getInstance("RSA");
 	}
 	public KeyPair getKeyPair() throws NoSuchAlgorithmException {

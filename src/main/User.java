@@ -193,4 +193,24 @@ public class User {
         return this.password.matches(PASSWORD_SECURITY_PATTERN)
                 && !this.password.contains(" ");
     }
+
+    public static String getNameById(String user_id) throws SQLException, ClassNotFoundException {
+        DbHandler db = new DbHandler();
+
+        PreparedStatement query = db.connection.prepareStatement("SELECT Name FROM users WHERE ID = ?", Statement.RETURN_GENERATED_KEYS);
+        query.setString(1, user_id);
+
+        ResultSet rs = query.executeQuery();
+        String[] user_columns = {"Name"};
+        String  userName = null;
+        if (rs.next()){
+            for (String column : user_columns) {
+                if (rs.getString(column) == null) {
+                    return null;
+                }
+                userName = rs.getString(column);
+            }
+        }
+        return userName;
+    }
 }

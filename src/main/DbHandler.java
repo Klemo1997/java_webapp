@@ -1,10 +1,16 @@
 package main;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DbHandler {
 
@@ -27,7 +33,6 @@ public class DbHandler {
                 : name_split[name_split.length - 2];
         String user_id = uploadedBy;
 
-        // todo: pridaj do databazy
         PreparedStatement query = connection.prepareStatement("INSERT INTO files(filename, path, mime_type, owner_id) values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         query.setString(1, name);
         query.setString(2, path);
@@ -37,7 +42,108 @@ public class DbHandler {
         return true;
     }
 
-    public ArrayList<String> getFilteredFiles(FileFilter filter) throws SQLException {
+    private String[] getUsersLike(String searchQuery) throws SQLException {
+        PreparedStatement query = connection.prepareStatement("SELECT ID FROM users WHERE Name LIKE ?", Statement.RETURN_GENERATED_KEYS);
+        query.setString(1, "%" + searchQuery + "%");
+        ResultSet resultSet = query.executeQuery();
+        int index = 1;
+        int rowCount = getRowCount(resultSet);
+        String[] users = new String[rowCount];
+        while (resultSet.next()) {
+            users[index - 1] = resultSet.getString("ID");
+            index++;
+        }
+        return users;
+    }
+
+    public HashMap<String, String> getCompleteFileInfo(FileFilter filter) throws SQLException, FileNotFoundException {
+
+        HashMap<String, String> fileInfo = new HashMap<String, String>();
+
+        if (filter.fileId == null) {
+            return fileInfo;
+        }
+
+        PreparedStatement query = connection.prepareStatement("SELECT * FROM files WHERE id_file = ?", Statement.RETURN_GENERATED_KEYS);
+        query.setString(1, filter.fileId);
+
+        File MySqlExceptions = new File("SQLerr.log");
+        PrintStream ps = new PrintStream(MySqlExceptions);
+
+        try {
+            ResultSet resultSet = query.executeQuery();
+            String[] wantedColumns = filter.wantedColumns;
+
+            while (resultSet.next()) {
+
+                for (String column : wantedColumns) {
+                    if (resultSet.getString(column) == null) {
+                        //data corrupted
+                        fileInfo = null;
+                        throw new Exception("Invalid data for file");
+                    }
+                    fileInfo.put(column, resultSet.getString(column));
+                }
+            }
+
+        } catch (MySQLSyntaxErrorException sqlExc) {
+            // Nastane pri pokusoch o injekcie, alebo nebodaj XSS vo vyhladavacom vstupe, proste blbosti v inpute
+            // na vyhladavanie fileov
+
+            //Zapiseme do logov
+            sqlExc.printStackTrace(ps);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        ps.close();
+        return fileInfo;
+    }
+
+    /**
+     * Podla userId
+     * najdeme vsetky ids jeho suborov
+     *
+     * @param ownerId
+     * @return
+     * @throws SQLException
+     * @throws FileNotFoundException
+     */
+    public ArrayList<String> getFileIdsByOwner(String ownerId) throws SQLException, FileNotFoundException {
+        if (ownerId == null) {
+            return null;
+        }
+
+        PreparedStatement query = connection.prepareStatement("SELECT id_file FROM files WHERE owner_id = ?", Statement.RETURN_GENERATED_KEYS);
+        query.setString(1, ownerId);
+
+        File MySqlExceptions = new File("SQLerr.log");
+        PrintStream ps = new PrintStream(MySqlExceptions);
+
+        ArrayList<String> ids = new ArrayList<String>();
+        try {
+            ResultSet resultSet = query.executeQuery();
+            while (resultSet.next()) {
+                if (resultSet.getString("id_file") != null) {
+                    ids.add(resultSet.getString("id_file"));
+                }
+            }
+
+        } catch (MySQLSyntaxErrorException sqlExc) {
+            // Nastane pri pokusoch o injekcie, alebo nebodaj XSS vo vyhladavacom vstupe, proste blbosti v inpute
+            // na vyhladavanie fileov
+
+            //Zapiseme do logov
+            sqlExc.printStackTrace(ps);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ps.close();
+
+        return ids;
+    }
+
+    public HashMap<String, Map<String, String>> getFilteredFilesV2(FileFilter filter) throws SQLException, FileNotFoundException {
         String author_query = "";
         String name_query = "";
         String[] owners = null;
@@ -53,18 +159,29 @@ public class DbHandler {
                     author_query += " ? )";
                 }
             }
-
         }
         if (filter.searchFileNames) {
             name_query = " filename LIKE ? ";
         }
+        // Hladame konkretneho usera (mozme mu ale filtrovat fily podla mena)
         if (filter.userId != null) {
             author_query = " owner_id = ? ";
         }
+        // Hladame konkretny file
+        if (filter.fileId != null) {
+            name_query = " id_file = ? ";
+            author_query = "";
+        }
+
         // Oddelime podmienky ANDom
         String condition_separator = !author_query.equals("") && !name_query.equals("") ? " OR " : "";
 
-        PreparedStatement query = connection.prepareStatement("SELECT path FROM files WHERE " + author_query + condition_separator + name_query, Statement.RETURN_GENERATED_KEYS);
+        String queryString = filter.allFiles && filter.isDisabled
+            ? "SELECT * FROM files"
+            : "SELECT * FROM files WHERE " + author_query + condition_separator + name_query;
+
+
+        PreparedStatement query = connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
         int parameterIndex = 1;
         if (filter.searchAuthorNames && filter.userId == null) {
             for (String owner : owners) {
@@ -82,29 +199,44 @@ public class DbHandler {
             query.setString(parameterIndex, "%" + filter.searchQuery + "%");
         }
 
-        ResultSet resultSet = query.executeQuery();
-
-
-        ArrayList<String> results = new ArrayList<>();
-
-        while (resultSet.next()) {
-            results.add(resultSet.getString("path"));
+        if (filter.fileId != null) {
+            query.setString(parameterIndex, filter.fileId);
         }
-        return results;
+
+        HashMap<String, Map<String, String>> fileMap = new HashMap<>();
+
+        File MySqlExceptions = new File("SQLerr.log");
+        PrintStream ps = new PrintStream(MySqlExceptions);
+
+        try {
+            ResultSet resultSet = query.executeQuery();
+            while (resultSet.next()) {
+                fileMap.put(
+                        resultSet.getString("id_file"), //key
+                        getFileDataFromResultSet(resultSet, filter.wantedColumns) //value
+                );
+            }
+
+        } catch (MySQLSyntaxErrorException sqlExc) {
+            // Nastane (mozno) pri pokusoch o injekcie, alebo nebodaj XSS vo vyhladavacom vstupe, proste blbosti v inpute
+            // na vyhladavanie fileov
+
+            //Zapiseme do logov
+            sqlExc.printStackTrace(ps);
+        }
+        ps.close();
+        return fileMap;
     }
 
-    private String[] getUsersLike(String searchQuery) throws SQLException {
-        PreparedStatement query = connection.prepareStatement("SELECT ID FROM users WHERE Name LIKE ?", Statement.RETURN_GENERATED_KEYS);
-        query.setString(1, "%" + searchQuery + "%");
-        ResultSet resultSet = query.executeQuery();
-        int index = 1;
-        int rowCount = getRowCount(resultSet);
-        String[] users = new String[rowCount];
-        while (resultSet.next()) {
-            users[index - 1] = resultSet.getString("ID");
-            index++;
+    public HashMap<String, String> getFileDataFromResultSet(ResultSet rs, String[] wantedColumns) throws SQLException {
+        HashMap<String, String> retMap = new HashMap<>();
+        for (String column : wantedColumns) {
+            if (rs.getString(column) == null) {
+                return null;
+            }
+            retMap.put(column, rs.getString(column));
         }
-        return users;
+        return retMap;
     }
 
     private int getRowCount(ResultSet resultSet) {
