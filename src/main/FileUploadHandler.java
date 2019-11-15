@@ -4,13 +4,11 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +17,9 @@ import java.util.Map;
 public class FileUploadHandler extends HttpServlet
 {
     private static final long serialVersionUID = 1L;
-    public static String setMetaString = null;
-    public static String privateKeyToSee = null;
-
-    public FileUploadHandler() throws MalformedURLException {
-    }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
         HttpSession session = request.getSession();
 
@@ -48,12 +41,11 @@ public class FileUploadHandler extends HttpServlet
                 {
                     if(!item.isFormField())
                     {
+                        String name = new File(item.getName()).getName();
                         if (item.getFieldName().equals("keyFile")) {
-                            String name = new File(item.getName()).getName();
                             keyFile = new File(DirectoryManager.getUploadRoot(session.getAttribute("userId")) + "inputKey");
                             item.write(keyFile);
                         } else {
-                            String name = new File(item.getName()).getName();
                             // Osetrime aby sa subor s rovnakym nazvom neprepisal, subor.txt sa nahradi suborom subor-new.txt
                             name = sanitizeFileName(
                                     multiparts.get(2).getString().equals("enc"),
@@ -119,9 +111,9 @@ public class FileUploadHandler extends HttpServlet
             {
                 request.setAttribute("message", "File Enc/Dec Failed due to" + ex);
                 if (ex.getMessage().equals("Temp file not deleted properly")) {
-                    response.sendRedirect(request.getContextPath() + "?error=2" );
+                    response.sendRedirect("index.jsp" + "?error=2" );
                 } else {
-                    response.sendRedirect(request.getContextPath() + "?error=1" );
+                    response.sendRedirect("index.jsp" + "?error=1" );
                 }
             }
         }
@@ -131,10 +123,7 @@ public class FileUploadHandler extends HttpServlet
         }
 
     }
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	
-    }
+
     /**
      * Tu kontrolujeme ci uz subor s takym nazvom neexistuje, ak ano
      * pridame mu k nazvu koncovku "-new", napr test.txt -> test-new.txt

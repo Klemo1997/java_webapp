@@ -81,7 +81,8 @@
 <div class="container text-center mt-5">
 
     <div class="alert alert-danger hidden error-flash" role="alert">
-        Upload súboru zlyhal, skúste to znova, prosím.
+        Upload súboru zlyhal, skúste to znova, prosím<br>
+        Pri dešifrovaní skontrolujte, či ste použili správny privátny kľúč
     </div>
 
     <div class="form-box text-center" align="center">
