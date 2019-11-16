@@ -37,7 +37,7 @@ public class FileDownloadServlet extends HttpServlet {
         } catch (Exception e) {
             if (e.getMessage().equals("unauthorized")) {
                 // Sahame na subor na ktory nemame prava
-                response.sendRedirect("/files.jsp?error=unauthorized");
+                response.sendRedirect("files.jsp?error=unauthorized");
                 return;
             }
         }

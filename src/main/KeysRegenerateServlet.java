@@ -33,13 +33,13 @@ public class KeysRegenerateServlet extends HttpServlet {
             writeToFile(privKey, pair.getPrivate().getEncoded());
             writeToFile(pubKey, pair.getPublic().getEncoded());
 
-            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?error=0" );
+            resp.sendRedirect(req.getContextPath() + "key_manager.jsp?error=0" );
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?error=1" );
+            resp.sendRedirect(req.getContextPath() + "key_manager.jsp?error=1" );
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?/error=2" );
+            resp.sendRedirect(req.getContextPath() + "key_manager.jsp?/error=2" );
         }
     }
 

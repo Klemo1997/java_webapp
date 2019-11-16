@@ -110,6 +110,10 @@ public class FileUploadHandler extends HttpServlet
             catch(Exception ex)
             {
                 request.setAttribute("message", "File Enc/Dec Failed due to" + ex);
+
+                File file = new File("test.log");
+                PrintStream ps = new PrintStream(file);
+                ex.printStackTrace(ps);
                 if (ex.getMessage().equals("Temp file not deleted properly")) {
                     response.sendRedirect("index.jsp" + "?error=2" );
                 } else {

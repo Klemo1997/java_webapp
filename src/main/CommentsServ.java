@@ -23,9 +23,9 @@ public class CommentsServ extends HttpServlet {
                     params.get("param")
                 )
             ) {
-                response.sendRedirect("/view.jsp?id=" + params.get("param") + "&error=comment");
+                response.sendRedirect("view.jsp?id=" + params.get("param") + "&error=comment");
             }
-            response.sendRedirect("/view.jsp?id=" + params.get("param") + "&success=comment");
+            response.sendRedirect("view.jsp?id=" + params.get("param") + "&success=comment");
         }
 
     }

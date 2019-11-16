@@ -44,7 +44,7 @@ public class PermissionServ extends HttpServlet {
                 redirect += "&error=acceptfailed";
             }
         }
-        resp.sendRedirect("/view.jsp?id="+redirect);
+        resp.sendRedirect("view.jsp?id="+redirect);
     }
 
 
