@@ -50,7 +50,7 @@
         FileListManager flm = new FileListManager(userId);
         fileData = flm.getCompleteInfo(filter).get(fileId);
         if (fileData == null) {
-            response.sendRedirect("/files.jsp?err=filenotfound");
+            response.sendRedirect("files.jsp?err=filenotfound");
         }
     }
     ArrayList<HashMap<String, String>> unacceptedRequests = null;
@@ -137,7 +137,7 @@
                             <% for (HashMap<String, String> permission : unacceptedRequests) { %>
 
                                 <div class="my-1">
-                                    <form name="accept-permission" method="post" action="/permission/accept">
+                                    <form name="accept-permission" method="post" action="permission/accept">
 
                                         <div style="float:left; line-height: 30px;">Žiadosť od : <strong class="text-success"><%= User.getNameById(permission.get("to_id")) %></strong></div>
                                         <div style="float:right">
