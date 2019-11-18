@@ -37,7 +37,7 @@ public class DbHandler {
         PreparedStatement query = connection.prepareStatement("INSERT INTO files(filename, path, mime_type, owner_id) values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         query.setString(1, name);
         query.setString(2, path);
-        query.setString(3, mimeType);
+        query.setString(3, mimeType.length() > 8 ? mimeType.substring(0, 8) : mimeType);
         query.setInt(4, Integer.valueOf(user_id));
         query.executeUpdate();
         return true;
