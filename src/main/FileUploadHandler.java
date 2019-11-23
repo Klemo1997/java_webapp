@@ -33,9 +33,7 @@ public class FileUploadHandler extends HttpServlet
                 encrypted = null,
                 keyFile = null;
 
-                String
-                key = null,
-                mode = null;
+                String mode = null;
 
                 for(FileItem item : multiparts)
                 {
@@ -60,23 +58,21 @@ public class FileUploadHandler extends HttpServlet
                     }
                     else
                     {
-                        switch (item.getFieldName()) {
-                            case "key" :
-                                key = item.getString();
-                                break;
-                            case "cryption-type" :
-                                mode = item.getString();
-                                break;
-                            default :
-
+                        if ("cryption-type".equals(item.getFieldName())) {
+                            mode = item.getString();
                         }
                     }
                 }
                 //File uploaded successfully
+                assert mode != null;
                 if (mode.equals("enc")) {
                     CryptoUtils.encrypt(keyFile,temp,encrypted);
                 } else if (mode.equals("dec")) {
                     CryptoUtils.decrypt(keyFile,temp,encrypted);
+                }
+
+                if (encrypted == null) {
+                    throw new Exception("crypt_file_error");
                 }
 
                 String fileName = mode.equals("enc")

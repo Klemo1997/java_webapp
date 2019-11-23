@@ -1,6 +1,5 @@
 package main;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,7 @@ import java.io.PrintStream;
 
 @WebServlet(name = "RegServ")
 public class RegistrationServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         try {
             User user = new User();
@@ -39,7 +38,7 @@ public class RegistrationServlet extends HttpServlet {
             response.sendRedirect("login.jsp?registration=success");
 
         } catch (Exception e) {
-            String errorType = null;
+            String errorType;
             switch(e.getMessage()) {
                 case "user_exists":
                     errorType = "userexists";
@@ -64,7 +63,7 @@ public class RegistrationServlet extends HttpServlet {
         }
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
     }
 

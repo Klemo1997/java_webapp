@@ -148,6 +148,12 @@
                     <a href="view.jsp?id=<%= file_id %>">
                         <%=uploadfiles.get(file_id).get("filename")%>
                         <small class="user-name-filelist text-muted"><%= !uploadfiles.get(file_id).get("owner_id").equals(userId) ? "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" : "" %></small>
+                        <% if (
+                           uploadfiles.get(file_id).get("owner_id").equals(userId) &&
+                           Integer.parseInt(uploadfiles.get(file_id).get("key_deprecated")) == 1
+                        ) { %>
+                        <small class="user-name-filelist text-danger">(Neaktuálny kľúč)</small>
+                        <% } %>
                     </a>
                     <% if(PermissionHandler.canAccess(userId, file_id)) { %>
                         <a href="download/<%=file_id%>" class="to-right" type="submit">

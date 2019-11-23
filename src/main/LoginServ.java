@@ -1,6 +1,5 @@
 package main;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
@@ -8,7 +7,7 @@ import java.util.Date;
 
 @WebServlet(name = "LoginServ")
 public class LoginServ extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         int badLoginCount = session.getAttribute("badLoginAttempt") != null
                 ? (int)session.getAttribute("badLoginAttempt")
@@ -62,10 +61,6 @@ public class LoginServ extends HttpServlet {
             session.setAttribute("badLoginAttempt", ++badLoginCount);
             response.sendRedirect("login.jsp?error=1");
         }
-
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
     }
 }

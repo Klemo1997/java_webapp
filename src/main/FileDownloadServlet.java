@@ -1,6 +1,5 @@
 package main;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,9 +16,9 @@ public class FileDownloadServlet extends HttpServlet {
 
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
-        String userId = null;
+        String userId;
         if (session.getAttribute("userId") == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -30,6 +29,7 @@ public class FileDownloadServlet extends HttpServlet {
         Map<String, String> params = parseUrlParams(request.getRequestURL().toString());
 
         //download/recrypt/3
+        assert params != null;
         if (params.get("param").equals("recrypt")) {
             String fileId = params.get("param1");
             FileFilter  filter = new FileFilter(fileId);
@@ -38,15 +38,14 @@ public class FileDownloadServlet extends HttpServlet {
 
             try {
                 fileData = flm.getCompleteInfo(filter).get(fileId);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
             try {
 
                 CryptoUtils crUtils = new CryptoUtils();
+                assert fileData != null;
                 File reencrypted = new File(crUtils.reEncrypt(fileData, userId));
 
                 byte[] buffer = new byte[4096];
@@ -88,6 +87,7 @@ public class FileDownloadServlet extends HttpServlet {
         Map<String, String> params = parseUrlParams(request.getRequestURL().toString());
 
         try {
+            assert params != null;
             Integer.parseInt(params.get("param"));
             // Nastavime filter aby hladal file podla ID
             FileFilter filter = new FileFilter(FileFilter.ALL_MY_FILES);
@@ -110,6 +110,7 @@ public class FileDownloadServlet extends HttpServlet {
                 response.sendRedirect("/files.jsp?error=unauthorized");
                 return;
             }
+            response.sendRedirect("/files.jsp?error=true");
         }
         // Pokracujeme len ak sme dostali exception inu ako unauthorized, pravdepodobne
         // volame cez staru metodu downloads + nazov
@@ -120,18 +121,18 @@ public class FileDownloadServlet extends HttpServlet {
         // Posledny prvok bude nas parameter pre file
         String filename = parsedUrl[parsedUrl.length - 1].split("\\?")[0];
 
-        downloadFile(filename, null, response, (String) session.getAttribute("userId"));
+        downloadFile(filename, response, (String) session.getAttribute("userId"));
     }
 
     /**
-     * Downloadneme zasifrofany subor
-     *
+     * Downloadneme zasifrovany subor
      * @param filename
      * @param response
+     * @param userId
      * @throws IOException
      */
-    private void downloadFile(String filename, String desiredName , HttpServletResponse response, String userId) throws IOException {
-        File toDownload = null;
+    private void downloadFile(String filename, HttpServletResponse response, String userId) throws IOException {
+        File toDownload;
 
         toDownload = new File(DirectoryManager.getUploadRoot(userId) + filename);
         if (!toDownload.exists()) {
@@ -148,12 +149,8 @@ public class FileDownloadServlet extends HttpServlet {
             out.write(buffer, 0, length);
         }
 
-        desiredName = desiredName == null
-                ? filename
-                : desiredName;
-
         response.setContentType("application/x-msdownload");
-        response.setHeader("Content-Disposition", "attachment; filename=" +  desiredName);
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
         in.close();
         out.flush();
@@ -197,16 +194,16 @@ public class FileDownloadServlet extends HttpServlet {
         int addedParams = 0;
 
 
-        HashMap<String, String> params = new HashMap<String, String>();
-        for (int i = 0; i < splitUrl.length; i++) {
+        HashMap<String, String> params = new HashMap<>();
+        for (String s : splitUrl) {
 
             if (startParams && addedParams >= 0) {
                 // dalej zapisujeme dalsie parametre ktore pridu v url
-                params.put("param" + (addedParams == 0 ? "" : String.valueOf(addedParams)), splitUrl[i]);
+                params.put("param" + (addedParams == 0 ? "" : String.valueOf(addedParams)), s);
                 addedParams++;
             }
 
-            if (splitUrl[i].equals("download")) {
+            if (s.equals("download")) {
                 params.put("method", "download");
                 startParams = true;
             }

@@ -8,7 +8,7 @@ import java.util.Map;
 public class FileFilter {
     boolean searchFileNames;
     boolean searchAuthorNames;
-    public boolean allFiles = false;
+    boolean allFiles = false;
     String searchQuery;
     boolean isDisabled = false;
     String userId = null;
@@ -18,9 +18,9 @@ public class FileFilter {
     //Zrychlenie vytvarania filtrov, hodit do konstruktora
 
     // Iba moje subory
-    public static final int ALL_MY_FILES = 1;
+    static final int ALL_MY_FILES = 1;
     // Vsetky subory
-    public static final int ALL_FILES = 2;
+    private static final int ALL_FILES = 2;
 
 
     public FileFilter(boolean search_file_names, boolean search_author_names, String query, boolean allFiles){
@@ -43,18 +43,19 @@ public class FileFilter {
             this.fileId = fileId;
         } catch (Exception e) {
             // neciselny string
+            this.fileId = "0";
         }
     }
 
-    public FileFilter(int constructForFind){
+    FileFilter(int constructForFind){
         this.searchFileNames = false;
         this.searchAuthorNames = false;
         this.searchQuery = null;
         this.isDisabled = true;
 
-        if (constructForFind == this.ALL_MY_FILES) {
+        if (constructForFind == ALL_MY_FILES) {
             this.allFiles = false;
-        } else if (constructForFind == this.ALL_FILES) {
+        } else if (constructForFind == ALL_FILES) {
             this.allFiles = true;
         }
     }
@@ -74,13 +75,13 @@ public class FileFilter {
      * VSETKY COLLUMNS !
      * @return
      */
-    public HashMap<String, String> doCompleteInfoFiltration() throws SQLException, ClassNotFoundException, FileNotFoundException {
+    HashMap<String, String> doCompleteInfoFiltration() throws SQLException, ClassNotFoundException, FileNotFoundException {
         DbHandler dbh = new DbHandler();
         this.wantedColumns = new String[] {"filename", "path", "mime_type", "key_deprecated", "owner_id"};
         return dbh.getCompleteFileInfo(this);
     }
 
-    public HashMap<String, Map<String, String>> doFiltrationV2() throws SQLException, ClassNotFoundException, FileNotFoundException {
+    HashMap<String, Map<String, String>> doFiltrationV2() throws SQLException, ClassNotFoundException, FileNotFoundException {
         DbHandler dbh = new DbHandler();
         this.wantedColumns = new String[]{"id_file", "filename", "path", "mime_type", "key_deprecated", "owner_id"};
         if (this.searchQuery == null || this.searchQuery.equals("")) {
@@ -107,11 +108,7 @@ public class FileFilter {
         this.userId = id;
     }
 
-    public void setWantedColumns(String[] wantedColumns){
-        this.wantedColumns = wantedColumns;
-    }
-
-    public void setToFindFileName(String searchQuery){
+    void setToFindFileName(String searchQuery){
         this.isDisabled = false;
         this.searchFileNames = true;
         this.searchQuery = searchQuery;

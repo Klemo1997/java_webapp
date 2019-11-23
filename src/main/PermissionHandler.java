@@ -4,19 +4,19 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class PermissionHandler {
 
-    public static String[] allCollumns = new String[]{"id_p", "to_id", "to_file_id", "granted"};
+    private static String[] allCollumns = new String[]{"id_p", "to_id", "to_file_id", "granted"};
 
     /**
      * Spracuje poziadavku o pristup k suboru
      *
      * @param to
      * @param to_file
-     * @return
      */
-    public static boolean sendRequest(String to, String to_file){
+    static void sendRequest(String to, String to_file){
         try {
             DbHandler db = new DbHandler();
             ArrayList<String> values = new ArrayList<>();
@@ -26,12 +26,10 @@ public class PermissionHandler {
             values.add(String.valueOf(0));
             db.add("INSERT INTO permissions (to_id, to_file_id, granted) VALUES (?, ?, ?)", values);
         } catch (Exception e) {
-            return false;
         }
-        return true;
     }
 
-    public static boolean acceptRequest(String permission_id){
+    static boolean acceptRequest(String permission_id){
         try {
             DbHandler db = new DbHandler();
             ArrayList<String> values = new ArrayList<>();
@@ -58,7 +56,7 @@ public class PermissionHandler {
         }
     }
 
-    public static HashMap<String, String> getRequestStatus(String permission_id) {
+    static HashMap<String, String> getRequestStatus(String permission_id) {
         try {
             DbHandler db = new DbHandler();
             ArrayList<String> values = new ArrayList<>();
@@ -93,7 +91,7 @@ public class PermissionHandler {
         FileFilter filter = new FileFilter(FileFilter.ALL_MY_FILES);
         filter.fileId = fileId;
 
-        HashMap<String, String> file = null;
+        HashMap<String, String> file;
         try {
             DbHandler db = new DbHandler();
             file = db.getCompleteFileInfo(filter);
@@ -110,11 +108,6 @@ public class PermissionHandler {
             return true;
         }
 
-
-        return getRequestStatus(userId, fileId) != null
-                ? (getRequestStatus(userId, fileId).get("granted").equals("1") ? true : false)
-                : false;
+        return getRequestStatus(userId, fileId) != null && (Objects.requireNonNull(getRequestStatus(userId, fileId)).get("granted").equals("1"));
     }
-
-
 }

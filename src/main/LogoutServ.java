@@ -1,17 +1,12 @@
 package main;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet(name = "LogoutServ")
 public class LogoutServ extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         response.setContentType("text/html");
 
@@ -24,12 +19,10 @@ public class LogoutServ extends HttpServlet {
                 }
             }
         }
-        //invalidate the session if exists
+        //invalidate the session
         HttpSession session = request.getSession(false);
         System.out.println("User="+session.getAttribute("userId"));
-        if(session != null){
-            ((HttpSession) session).invalidate();
-        }
+        session.invalidate();
         response.sendRedirect("login.jsp");
     }
 }

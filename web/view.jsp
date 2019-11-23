@@ -159,7 +159,8 @@
                                 <small class="text-muted mt-1 mb-2">
                                     <i class="fas fa-info" aria-hidden="true"></i>
                                     Kľúč použitý na šifrovanie tohto súboru je neaktuálny. Používateľ ho od
-                                    nahratia súboru odstránil, alebo pregeneroval.
+                                    nahratia súboru odstránil, alebo pregeneroval. Pre odšifrovanie tohto súboru
+                                    je potrebné získať privátny kľúč od majiteľa.
                                 </small>
                             </div>
                         <% } else { %>
