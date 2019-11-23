@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileFilter {
-    boolean searchFileNames = true;
-    boolean searchAuthorNames = false;
+    boolean searchFileNames;
+    boolean searchAuthorNames;
     public boolean allFiles = false;
-    String searchQuery = null;
+    String searchQuery;
     boolean isDisabled = false;
     String userId = null;
     String fileId = null;
@@ -76,13 +76,13 @@ public class FileFilter {
      */
     public HashMap<String, String> doCompleteInfoFiltration() throws SQLException, ClassNotFoundException, FileNotFoundException {
         DbHandler dbh = new DbHandler();
-        this.wantedColumns = new String[] {"filename", "path", "mime_type", "owner_id"};
+        this.wantedColumns = new String[] {"filename", "path", "mime_type", "key_deprecated", "owner_id"};
         return dbh.getCompleteFileInfo(this);
     }
 
     public HashMap<String, Map<String, String>> doFiltrationV2() throws SQLException, ClassNotFoundException, FileNotFoundException {
         DbHandler dbh = new DbHandler();
-        this.wantedColumns = new String[]{"id_file", "filename", "path", "mime_type", "owner_id"};
+        this.wantedColumns = new String[]{"id_file", "filename", "path", "mime_type", "key_deprecated", "owner_id"};
         if (this.searchQuery == null || this.searchQuery.equals("")) {
             this.isDisabled = true;
         }

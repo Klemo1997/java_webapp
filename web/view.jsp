@@ -10,11 +10,11 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    //allow access only if session exists
     String user = null;
-
+    //allow access only if session exists
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
+        return;
     } else {
         user = (String) session.getAttribute("userId");
     }
@@ -129,8 +129,7 @@
                 </ul>
 
                 <% if (fileData.get("owner_id").equals(userId)) { %>
-                     <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a>
-
+                    <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a>
                     <div class="permission-request-container mt-4" style="margin: auto; width: 200px;">
                         <% if (unacceptedRequests != null) { %>
                         <h4>Žiadosti o prístup</h4>
@@ -152,7 +151,31 @@
                 <% } else { %>
                     <% if (PermissionHandler.canAccess(userId, fileId)) { %>
                         <p class="card-text">K tomuto súboru máte udelený prístup</p>
-                        <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a>
+
+                        <% if (Integer.parseInt(fileData.get("key_deprecated")) == 1) { %>
+                            <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a><br/>
+
+                            <div class="info-div">
+                                <small class="text-muted mt-1 mb-2">
+                                    <i class="fas fa-info" aria-hidden="true"></i>
+                                    Kľúč použitý na šifrovanie tohto súboru je neaktuálny. Používateľ ho od
+                                    nahratia súboru odstránil, alebo pregeneroval.
+                                </small>
+                            </div>
+                        <% } else { %>
+                        <form action="download/recrypt/<%= fileId %>" method="post" name="decrypt-download">
+                            <button type="submit" class="btn btn-primary">Stiahnuť súbor v mojej šifre</button>
+                        </form>
+
+                        <div class="info-div">
+                            <small class="text-muted mt-1 mb-2">
+                                <i class="fas fa-info" aria-hidden="true"></i>
+                                Systém sa pokúsi súbor prešifrovať pre váš aktuálny kľúč. Ak ho od šifrovania súboru
+                                používateľ zmenil, oznámi vám to systém a ponúkne na stiahnutie súbor ku ktorému budete
+                                potrebovať privátny kľúč od majiteľa.
+                            </small>
+                        </div>
+                        <% } %>
                     <% } else { %>
                         <p class="card-text">K tomuto súboru nemáte prístup</p>
                         <% if (
@@ -231,6 +254,9 @@
     } else if (url.searchParams.get('success') === 'comment') {
         $('.success-flash').text('Komentár bol pridaný');
         $('.success-flash').show();
+    } else if (url.searchParams.get('error') === "deprecatedprivatekey") {
+        $('.error-flash').text('Nepodarilo sa prešifrovať súbor. Privátny kľúč užívateľa bol od nahratia súbora zmenený, môžete stiahnuť neprešifrovaný súbor, od užívateľa ale na dešifrovanie potrebujete jeho pôvodný privátny kľúč použitý pri šifrovaní súboru');
+        $('.error-flash').show();
     }
 
     $('.error-flash, .success-flash').on('click', function () {

@@ -12,6 +12,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 
 public class CryptoUtils
 {
@@ -70,8 +71,9 @@ public class CryptoUtils
             // Zapiseme do streamu
             outputStream.write(output.toByteArray());
 
-
-            pubKey.delete();
+            if (!pubKey.getName().equals("inputKey")) {
+                pubKey.delete();
+            }
 
             inputStream.close();
             outputStream.close();
@@ -127,7 +129,9 @@ public class CryptoUtils
             FileOutputStream outputStream = new FileOutputStream(outputFile);
             outputStream.write(outputBytes);
 
-            privKey.delete();
+            if (privKey.getName().equals("inputKey")) {
+                privKey.delete();
+            }
 
             inputStream.close();
             outputStream.close();
@@ -141,6 +145,44 @@ public class CryptoUtils
         ) {
             throw new Exception("Errorencrypting/decryptingfile"+ex.getMessage(),ex);
         }
+    }
+
+    public String reEncrypt(HashMap<String, String> fileData, String receiverId) throws Exception {
+        File toReEncrypt = new File(fileData.get("path"));
+
+        if (!toReEncrypt.exists()) {
+            throw new Exception("file_not_found");
+        }
+
+        FileListManager flm = new FileListManager(fileData.get("owner_id"));
+        File decrypted = new File("temp/" + flm.getAlphaNumericString() + "." + fileData.get("mime_type"));
+        File reEncrypted = new File("temp/" + flm.getAlphaNumericString() + "." + fileData.get("mime_type") + ".enc");
+
+        if (!decrypted.createNewFile() || !reEncrypted.createNewFile()) {
+            throw new Exception("creating_tempfiles_error");
+        }
+
+        // Vyberieme si private key usera od ktoreho berieme subor
+        File privKey = flm.getUserPrivKey();
+        flm.setUserId(receiverId);
+        File myPubKey = flm.getUserPubKey();
+
+        try {
+            doDecrypt(Cipher.DECRYPT_MODE, toReEncrypt, decrypted, privKey);
+        } catch (Exception e) {
+            // Dekryptovanie sa nepodarilo, User ma neaktualny private key
+            if (e.getMessage().equals("Errorencrypting/decryptingfileDecryption error")) {
+                throw new Exception("deprecated_private_key");
+            }
+
+        }
+        doCrypto(Cipher.ENCRYPT_MODE, decrypted, reEncrypted, myPubKey);
+
+        if (!decrypted.delete()) {
+            throw new Exception("temp_delete_error");
+        }
+
+        return reEncrypted.getPath();
     }
 
     

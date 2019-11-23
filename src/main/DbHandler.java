@@ -19,7 +19,7 @@ public class DbHandler {
 
     public DbHandler() throws SQLException, ClassNotFoundException {
         Class.forName("com.mysql.jdbc.Driver");
-        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ubp_db","root","");//JumpUpAndDown
+        connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ubp_db","root","JumpUpAndDown");
     }
 
     public boolean AddFile (File file, String uploadedBy) throws IOException, SQLException {
@@ -75,7 +75,7 @@ public class DbHandler {
             ResultSet resultSet = query.executeQuery();
             String[] wantedColumns = filter.wantedColumns != null
                     ? filter.wantedColumns
-                    : new String[]{"id_file", "filename", "path", "mime_type", "owner_id"};
+                    : new String[]{"id_file", "filename", "path", "mime_type", "key_deprecated", "owner_id"};
 
             while (resultSet.next()) {
 
@@ -234,7 +234,7 @@ public class DbHandler {
         return fileMap;
     }
 
-    public HashMap<String, String> getFileDataFromResultSet(ResultSet rs, String[] wantedColumns) throws SQLException {
+    private HashMap<String, String> getFileDataFromResultSet(ResultSet rs, String[] wantedColumns) throws SQLException {
         HashMap<String, String> retMap = new HashMap<>();
         for (String column : wantedColumns) {
             if (rs.getString(column) == null) {
@@ -264,29 +264,14 @@ public class DbHandler {
         return 0;
     }
 
-    public void add(String queryString, ArrayList<String> values) throws SQLException, ClassNotFoundException {
-        DbHandler db = new DbHandler();
-
-        PreparedStatement query = db.connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
-        int paramCount = 1;
-        for (String val : values) {
-            query.setString(paramCount, val);
-            paramCount++;
-        }
-        query.executeUpdate();
+    void add(String queryString, ArrayList<String> values) throws SQLException {
+        getQuery(queryString,values).executeUpdate();
     }
 
     public ArrayList<HashMap<String, String>> get(String queryString, ArrayList<String> values, String[] columns)
-            throws SQLException, ClassNotFoundException, Exception {
-        DbHandler db = new DbHandler();
+            throws Exception {
 
-        PreparedStatement query = db.connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
-        int paramCount = 1;
-        for (String val : values) {
-            query.setString(paramCount, val);
-            paramCount++;
-        }
-        ResultSet rs = query.executeQuery();
+        ResultSet rs = getQuery(queryString, values).executeQuery();
         ArrayList<HashMap<String, String>> records = new ArrayList<>();
 
         while (rs.next()) {
@@ -301,6 +286,28 @@ public class DbHandler {
             records.add(record);
         }
         return records;
+    }
+
+    private void update(String queryString, ArrayList<String> values)
+            throws Exception {
+        getQuery(queryString, values).executeUpdate();
+    }
+
+    private PreparedStatement getQuery(String queryString, ArrayList<String> values) throws SQLException {
+        PreparedStatement query = this.connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
+        int paramCount = 1;
+        for (String val : values) {
+            query.setString(paramCount, val);
+            paramCount++;
+        }
+        return query;
+    }
+
+    void setDeprecatedKey(String fileId) throws Exception {
+        ArrayList<String> values = new ArrayList<>();
+        values.add("1");
+        values.add(fileId);
+        this.update("UPDATE files SET key_deprecated = ? WHERE id_file = ?", values);
     }
 
 }

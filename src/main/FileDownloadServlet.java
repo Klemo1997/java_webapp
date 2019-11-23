@@ -1,5 +1,6 @@
 package main;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,10 +9,79 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FileDownloadServlet extends HttpServlet {
+
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String userId = null;
+        if (session.getAttribute("userId") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        else {
+            userId = session.getAttribute("userId").toString();
+        }
+        Map<String, String> params = parseUrlParams(request.getRequestURL().toString());
+
+        //download/recrypt/3
+        if (params.get("param").equals("recrypt")) {
+            String fileId = params.get("param1");
+            FileFilter  filter = new FileFilter(fileId);
+            FileListManager flm = new FileListManager(userId);
+            HashMap<String, String> fileData = null;
+
+            try {
+                fileData = flm.getCompleteInfo(filter).get(fileId);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+
+                CryptoUtils crUtils = new CryptoUtils();
+                File reencrypted = new File(crUtils.reEncrypt(fileData, userId));
+
+                byte[] buffer = new byte[4096];
+                int length;
+                OutputStream out = response.getOutputStream();
+                FileInputStream in = new FileInputStream(reencrypted);
+
+                response.setContentType("application/x-msdownload");
+                response.setHeader("Content-Disposition", "attachment; filename=" +  fileData.get("filename"));
+
+                while((length = in.read(buffer)) > 0)
+                {
+                    out.write(buffer, 0, length);
+                }
+                reencrypted.delete();
+                request.setAttribute("message","File Reencrypted Successfully");
+                out.flush();
+            } catch (Exception e) {
+                if (e.getMessage().equals("deprecated_private_key")) {
+                    // User ma neaktualny privateKey, ulozime to do tabulky, informujeme ho o tom vo flashi, subor si moze stiahnut znova priamo
+                    try {
+                        DbHandler db = new DbHandler();
+                        db.setDeprecatedKey(fileId);
+                    } catch (Exception ex) {
+                        response.sendRedirect("/view.jsp?id=" + fileId + "&error=true");
+                    }
+
+                    response.sendRedirect("/view.jsp?id=" + fileId + "&error=deprecatedprivatekey");
+                } else {
+                    response.sendRedirect("/view.jsp?id=" + fileId + "&error=true");
+                }
+            }
+        }
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();

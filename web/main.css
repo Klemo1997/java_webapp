@@ -73,3 +73,8 @@ nav .container {
     border-bottom:1px dashed #efefef;
     margin-bottom:25px;
 }
+
+.info-div {
+    width: 350px;
+    margin: 10px auto;
+}

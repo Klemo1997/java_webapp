@@ -88,13 +88,22 @@ public class PermissionHandler {
         }
     }
 
-    public static boolean canAccess(String userId, String fileId) throws SQLException, ClassNotFoundException, FileNotFoundException {
+    public static boolean canAccess(String userId, String fileId){
         // Nastavime filter aby hladal file podla ID
         FileFilter filter = new FileFilter(FileFilter.ALL_MY_FILES);
         filter.fileId = fileId;
 
-        DbHandler db = new DbHandler();
-        HashMap<String, String> file = db.getCompleteFileInfo(filter);
+        HashMap<String, String> file = null;
+        try {
+            DbHandler db = new DbHandler();
+            file = db.getCompleteFileInfo(filter);
+        } catch (SQLException | ClassNotFoundException | FileNotFoundException e) {
+            return false;
+        }
+
+        if (file == null) {
+            return false;
+        }
 
         if (file.get("owner_id").equals(userId)) {
             // Sme vlastnik suboru

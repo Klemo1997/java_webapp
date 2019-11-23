@@ -19,6 +19,7 @@
 
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
+        return;
     } else {
         user = (String) session.getAttribute("userId");
     }
@@ -46,7 +47,7 @@
     }
 
     if (userName == null) {
-
+        response.sendRedirect("/logout");
     }
 
     FileFilter filter = new FileFilter(
@@ -189,6 +190,13 @@
 
     $('input[name=file_query]').prop('readonly', !$('input[type=checkbox]').is(':checked'));
 
+    $('.search-file-btn').on('click', function (e) {
+       if ($('input[name=file_query]').val().length > 256) {
+           e.preventDefault();
+           e.stopPropagation();
+           alert('Váš vyhľadávací výraz je príliš dlhý');
+       }
+    });
 </script>
 </body>
 </html>

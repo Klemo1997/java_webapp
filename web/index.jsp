@@ -5,6 +5,7 @@
 
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
+        return;
     } else {
         user = (String) session.getAttribute("userId");
     }
@@ -29,7 +30,7 @@
     }
 
     if (userName == null) {
-        // todo: tu musime osetrit "Prihlaseny ako null" bug
+        response.sendRedirect("/logout");
     }
 
 %>
