@@ -6,20 +6,18 @@
   Time: 22:47
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%
     //allow access only if session exists
-    String user = null;
+    String userId;
 
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
         return;
     } else {
-        user = (String) session.getAttribute("userId");
+        userId = (String) session.getAttribute("userId");
     }
     String userName = null;
-    String userId = null;
-    String sessionID = null;
 
     Cookie[] cookies = request.getCookies();
 
@@ -30,9 +28,6 @@
             }
             if(cookie.getName().equals("userId")) {
                 userId = cookie.getValue();
-            }
-            if(cookie.getName().equals("JSESSIONID")) {
-                sessionID = cookie.getValue();
             }
         }
     }
@@ -91,7 +86,7 @@
 
     <div class="container text-center mt-5">
 
-        <div class="text-center border-primary border p-5 regenerate-keys" align="center">
+        <div class="text-center border-primary border p-5 regenerate-keys">
             <h3> Pregenerovať kľúče </h3>
 
             <form name="fm" action="keys_regenerate" method="post" id="regenerate-form" enctype="multipart/form-data">

@@ -1,6 +1,8 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="main.*" %>
+<%@ page import="java.sql.SQLException" %>
+<%@ page import="java.util.Objects" %>
 <%--
   Created by IntelliJ IDEA.
   User: matus
@@ -8,19 +10,15 @@
   Time: 17:21
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%
-    String user = null;
+    String userId = null;
+    String userName = null;
     //allow access only if session exists
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
         return;
-    } else {
-        user = (String) session.getAttribute("userId");
     }
-    String userName = null;
-    String userId = null;
-    String sessionID = null;
 
     Cookie[] cookies = request.getCookies();
 
@@ -34,10 +32,6 @@
             if (cookie.getName().equals("userId")) {
                 userId = cookie.getValue();
             }
-
-            if (cookie.getName().equals("JSESSIONID")) {
-                sessionID = cookie.getValue();
-            }
         }
     }
 
@@ -48,12 +42,17 @@
 
     if (userId != null) {
         FileListManager flm = new FileListManager(userId);
-        fileData = flm.getCompleteInfo(filter).get(fileId);
+        try {
+            fileData = flm.getCompleteInfo(filter).get(fileId);
+        } catch (SQLException | ClassNotFoundException e) {
+            fileData = null;
+        }
         if (fileData == null) {
             response.sendRedirect("/files.jsp?err=filenotfound");
         }
     }
     ArrayList<HashMap<String, String>> unacceptedRequests = null;
+    assert fileData != null;
     if (fileData.get("owner_id").equals(userId)) {
         unacceptedRequests = PermissionHandler.getRequestsForFile(fileId, false);
     }
@@ -121,7 +120,15 @@
                 <h5 class="card-title"><%= fileData.get("filename") %></h5>
                 <ul class="list-group mb-4" style="width: 40%; margin: auto">
                     <li class="list-group-item">Typ : <%= fileData.get("mime_type") %></li>
-                    <li class="list-group-item">Vlastní : <%= User.getNameById(fileData.get("owner_id")) %>
+                    <%
+                    String ownerName;
+                        try {
+                            ownerName = User.getNameById(fileData.get("owner_id"));
+                        } catch (Exception e) {
+                            ownerName = "error";
+                        }
+                    %>
+                    <li class="list-group-item">Vlastní : <%= ownerName %>
                         <% if (fileData.get("owner_id").equals(userId)) { %>
                             <small class="text-muted"> (vy) </small>
                         <% } %>
@@ -136,11 +143,18 @@
                             <% for (HashMap<String, String> permission : unacceptedRequests) { %>
 
                                 <div class="my-1">
-                                    <form name="accept-permission" method="post" action="/permission/accept">
-
-                                        <div style="float:left; line-height: 30px;">Žiadosť od : <strong class="text-success"><%= User.getNameById(permission.get("to_id")) %></strong></div>
+                                    <form name="accept-permission" method="post" action="${pageContext.request.contextPath}/permission/accept">
+                                        <%
+                                            String permissionFrom;
+                                            try {
+                                                permissionFrom = User.getNameById(permission.get("to_id"));
+                                            } catch (Exception e) {
+                                                permissionFrom = "error";
+                                            }
+                                         %>
+                                        <div style="float:left; line-height: 30px;">Žiadosť od : <strong class="text-success"><%= permissionFrom %></strong></div>
                                         <div style="float:right">
-                                            <input type="hidden" name="permission-id" value="<%= permission.get("id_p") %>" required></input>
+                                            <input type="hidden" name="permission-id" value="<%= permission.get("id_p") %>" required>
                                             <button class="btn btn-outline-success"><i class="far fa-thumbs-up"></i></button>
                                         </div>
                                     </form>
@@ -181,7 +195,7 @@
                         <p class="card-text">K tomuto súboru nemáte prístup</p>
                         <% if (
                                PermissionHandler.getRequestStatus(userId, fileId) != null &&
-                               PermissionHandler.getRequestStatus(userId, fileId).get("granted").equals("0")
+                               Objects.requireNonNull(PermissionHandler.getRequestStatus(userId, fileId)).get("granted").equals("0")
                         ) { %>
                             <p class="text-danger">Čaká sa na potvrdenie vlastníka</p>
                         <% } else { %>
@@ -216,10 +230,17 @@
                                     <% for(int i = comments.size() - 1; i >= 0; i--) {
                                         // Potrebujeme vypisovat od najnovsich, opacne
                                         HashMap<String, String> comment = comments.get(i);
+
+                                        String commentAuthor;
+                                        try {
+                                            commentAuthor = User.getNameById(comment.get("author_id"));
+                                        } catch (Exception e) {
+                                            commentAuthor = "error";
+                                        }
                                     %>
                                     <li class="media">
                                         <div class="media-body">
-                                            <strong class="text-success"><%= User.getNameById(comment.get("author_id")) %></strong>
+                                            <strong class="text-success"><%= commentAuthor %></strong>
                                             <p>
                                                 <%= comment.get("body") %>
                                             </p>
@@ -247,17 +268,13 @@
     if (['requestfailed', 'acceptfailed'].includes(url.searchParams.get('error'))) {
         $('.error-flash').show();
     } else if (url.searchParams.get('permission') === "accepted") {
-        $('.success-flash').text('Práve ste udelili používateľovi prístup k vášmu súboru');
-        $('.success-flash').show();
+        $('.success-flash').text('Práve ste udelili používateľovi prístup k vášmu súboru').show();
     } else if (url.searchParams.get('permission') === 'requested') {
-        $('.success-flash').text('Žiadosť o prístup bola odoslaná');
-        $('.success-flash').show();
+        $('.success-flash').text('Žiadosť o prístup bola odoslaná').show();
     } else if (url.searchParams.get('success') === 'comment') {
-        $('.success-flash').text('Komentár bol pridaný');
-        $('.success-flash').show();
+        $('.success-flash').text('Komentár bol pridaný').show();
     } else if (url.searchParams.get('error') === "deprecatedprivatekey") {
-        $('.error-flash').text('Nepodarilo sa prešifrovať súbor. Privátny kľúč užívateľa bol od nahratia súbora zmenený, môžete stiahnuť neprešifrovaný súbor, od užívateľa ale na dešifrovanie potrebujete jeho pôvodný privátny kľúč použitý pri šifrovaní súboru');
-        $('.error-flash').show();
+        $('.error-flash').text('Nepodarilo sa prešifrovať súbor. Privátny kľúč užívateľa bol od nahratia súbora zmenený, môžete stiahnuť neprešifrovaný súbor, od užívateľa ale na dešifrovanie potrebujete jeho pôvodný privátny kľúč použitý pri šifrovaní súboru').show();
     }
 
     $('.error-flash, .success-flash').on('click', function () {

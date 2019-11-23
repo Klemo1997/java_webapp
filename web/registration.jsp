@@ -5,7 +5,7 @@
   Time: 11:30 AM
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%
     if (session.getAttribute("userId") != null) {
         response.sendRedirect("index.jsp");
@@ -13,7 +13,7 @@
 %>
 <html>
 <head>
-    <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
+    <meta http-equiv="Content−Type" content="text/html; charset=UTF−8">
     <title>Registrácia</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
@@ -47,7 +47,7 @@
     <div class="alert alert-danger hidden error-flash" role="alert"></div>
 
 
-    <div class="form-box text-center" align="center">
+    <div class="form-box text-center">
         <h2 class="display-5 mb-4"> Registrácia </h2>
 
         <form name="login-data" action="register" method="post">
@@ -72,21 +72,6 @@
     </div>
 </div>
 
-<style>
-
-    .form-box {
-        margin: auto;
-        background-color: #e6e6e6;
-        width: 350px;
-
-        padding: 20px 20px 20px 20px;
-    }
-
-    .generate-key-div {
-        width: 100%;
-    }
-
-</style>
 <script
         src="http://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -106,12 +91,10 @@
         var errorType = url.searchParams.get('error');
 
         if (typeof errorTexts[errorType] !== "undefined") {
-            $('.error-flash').text(errorTexts[errorType])
+            $('.error-flash').text(errorTexts[errorType]).show();
         } else {
-            $('.error-flash').text("Pri registrácii došlo k chybe, skúste to znova, prosím.")
+            $('.error-flash').text("Pri registrácii došlo k chybe, skúste to znova, prosím.").show();
         }
-
-        $('.error-flash').show();
     }
 
     $('.error-flash').on('click', function () {

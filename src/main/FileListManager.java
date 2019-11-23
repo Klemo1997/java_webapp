@@ -30,13 +30,17 @@ public class FileListManager {
      * @throws ClassNotFoundException
      * @throws FileNotFoundException
      */
-    public  HashMap<String, Map<String, String>> getUploads(FileFilter filter) throws SQLException, ClassNotFoundException, FileNotFoundException {
+    public  HashMap<String, Map<String, String>> getUploads(FileFilter filter)  {
         if (filter == null) {
             filter = new FileFilter(false, false, null, false);
         }
         //Ak vyberame vsetky fily, unsetneme ho vo filtri
         filter.setUserId(userId);
-        return filter.doFiltrationV2();
+        try {
+            return filter.doFiltrationV2();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

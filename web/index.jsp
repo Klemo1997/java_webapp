@@ -1,17 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
     //allow access only if session exists
-    String user = null;
 
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
         return;
     } else {
-        user = (String) session.getAttribute("userId");
     }
     String userName = null;
     String userId = null;
-    String sessionID = null;
 
     Cookie[] cookies = request.getCookies();
 
@@ -22,14 +19,11 @@
             }
             if(cookie.getName().equals("userId")) {
                 userId = cookie.getValue();
-            }
-            if(cookie.getName().equals("JSESSIONID")) {
-                sessionID = cookie.getValue();
-            }
+            }            
         }
     }
 
-    if (userName == null) {
+    if (userName == null || userId == null) {
         response.sendRedirect("/logout");
     }
 
@@ -40,10 +34,10 @@
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
+    <meta http-equiv="Content−Type" content="text/html; charset=UTF−8">
     <title>Nahraj súbor </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous" type="javascript"></script>
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -124,12 +118,12 @@
 <script
         src="http://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        crossorigin="anonymous" type="application/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous" type="application/javascript"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous" type="application/javascript"></script>
 <script type="application/javascript">
     $('input[type=radio][name=cryption-type]').on('change', function () {
-          var keystr, keyfilestr;
+          var keyfilestr;
         if ($(this).val() === 'enc') {
             keyfilestr = 'Nahraj verejný kľúč';
             $('.only-enc-visible').removeClass('d-none');

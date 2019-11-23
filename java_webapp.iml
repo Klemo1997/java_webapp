@@ -33,5 +33,10 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="fc14f2d665" level="application" />
+    <orderEntry type="library" name="jquery-3.4.1" level="application" />
+    <orderEntry type="library" name="popper" level="application" />
+    <orderEntry type="library" name="bootstrap" level="application" />
+    <orderEntry type="library" name="jquery-3.3.1.slim" level="application" />
   </component>
 </module>
