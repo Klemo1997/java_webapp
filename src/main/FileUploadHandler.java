@@ -8,10 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 public class FileUploadHandler extends HttpServlet
@@ -120,8 +117,5 @@ public class FileUploadHandler extends HttpServlet
         {
             request.setAttribute("message", "Sorry this Servlet only handles file upload request");
         }
-
     }
-
-
 }

@@ -33,7 +33,7 @@
     }
 
     if (userName == null) {
-        response.sendRedirect("/logout");
+        response.sendRedirect("logout");
     }
     Map<String, String> keysFiles = null;
 

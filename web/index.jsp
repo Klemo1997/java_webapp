@@ -24,7 +24,7 @@
     }
 
     if (userName == null || userId == null) {
-        response.sendRedirect("/logout");
+        response.sendRedirect("logout");
     }
 
 %>

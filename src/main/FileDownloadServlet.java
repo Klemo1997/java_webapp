@@ -4,10 +4,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -110,7 +107,10 @@ public class FileDownloadServlet extends HttpServlet {
                 response.sendRedirect("files.jsp?error=unauthorized");
                 return;
             }
-            response.sendRedirect("/files.jsp?error=true");
+            File file = new File("test.log");
+            PrintStream ps = new PrintStream(file);
+            e.printStackTrace(ps);
+            response.sendRedirect("files.jsp?error=true");
         }
         // Pokracujeme len ak sme dostali exception inu ako unauthorized, pravdepodobne
         // volame cez staru metodu downloads + nazov

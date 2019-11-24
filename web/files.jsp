@@ -38,7 +38,7 @@
     }
 
     if (userName == null) {
-        response.sendRedirect("/logout");
+        response.sendRedirect("logout");
     }
 
     FileFilter filter = new FileFilter(
