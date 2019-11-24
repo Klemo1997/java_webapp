@@ -32,6 +32,10 @@ public class DbHandler {
         String mimeType = Files.probeContentType(file.toPath()) != null
                 ? Files.probeContentType(file.toPath())
                 : name_split[name_split.length - 2];
+        // Ak mame setnuty tento mimetype, crashovalo
+        if (mimeType.equals("text/plain")) {
+            mimeType = "txt";
+        }
 
         PreparedStatement query = connection.prepareStatement("INSERT INTO files(filename, path, mime_type, owner_id) values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         query.setString(1, name);

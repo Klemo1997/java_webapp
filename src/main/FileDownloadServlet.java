@@ -4,10 +4,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +68,9 @@ public class FileDownloadServlet extends HttpServlet {
                     } catch (Exception ex) {
                         response.sendRedirect("/java_webapp_war/view.jsp?id=" + fileId + "&error=true");
                     }
-
+                    File file = new File("test.log");
+                    PrintStream ps = new PrintStream(file);
+                    e.printStackTrace(ps);
                     response.sendRedirect("/java_webapp_war/view.jsp?id=" + fileId + "&error=deprecatedprivatekey");
                 } else {
                     response.sendRedirect("/java_webapp_war/view.jsp?id=" + fileId + "&error=true");
