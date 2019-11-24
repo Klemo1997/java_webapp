@@ -70,7 +70,7 @@ class CryptoUtils
             // Zapiseme do streamu
             outputStream.write(output.toByteArray());
 
-            if (!pubKey.getName().equals("inputKey")) {
+            if (pubKey.getName().equals("inputKey")) {
                 pubKey.delete();
             }
 

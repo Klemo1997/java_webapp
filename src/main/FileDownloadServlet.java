@@ -43,7 +43,6 @@ public class FileDownloadServlet extends HttpServlet {
             }
 
             try {
-
                 CryptoUtils crUtils = new CryptoUtils();
                 assert fileData != null;
                 File reencrypted = new File(crUtils.reEncrypt(fileData, userId));
@@ -120,7 +119,11 @@ public class FileDownloadServlet extends HttpServlet {
         // Posledny prvok bude nas parameter pre file
         String filename = parsedUrl[parsedUrl.length - 1].split("\\?")[0];
 
-        downloadFile(filename, response, (String) session.getAttribute("userId"));
+        try {
+            downloadFile(filename, response, (String) session.getAttribute("userId"));
+        } catch (Exception e){
+            response.sendRedirect("/files.jsp?error=1");
+        }
     }
 
     /**
