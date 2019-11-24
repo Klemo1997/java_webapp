@@ -122,7 +122,7 @@ public class FileDownloadServlet extends HttpServlet {
         try {
             downloadFile(filename, response, (String) session.getAttribute("userId"));
         } catch (Exception e){
-            response.sendRedirect("/files.jsp?error=1");
+            response.sendRedirect("/java_webapp_war/files.jsp?error=1");
         }
     }
 

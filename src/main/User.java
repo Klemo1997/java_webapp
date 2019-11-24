@@ -60,7 +60,7 @@ public class User {
         return false;
     }
 
-    public String hashPassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    private String hashPassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
         int iter = 1000;
         byte[] salt = this.salt;
         char[] passwd = this.password.toCharArray();
