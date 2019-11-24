@@ -4,7 +4,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,12 +70,12 @@ public class FileDownloadServlet extends HttpServlet {
                         DbHandler db = new DbHandler();
                         db.setDeprecatedKey(fileId);
                     } catch (Exception ex) {
-                        response.sendRedirect("/view.jsp?id=" + fileId + "&error=true");
+                        response.sendRedirect("/java_webapp_war/view.jsp?id=" + fileId + "&error=true");
                     }
 
-                    response.sendRedirect("/view.jsp?id=" + fileId + "&error=deprecatedprivatekey");
+                    response.sendRedirect("/java_webapp_war/view.jsp?id=" + fileId + "&error=deprecatedprivatekey");
                 } else {
-                    response.sendRedirect("/view.jsp?id=" + fileId + "&error=true");
+                    response.sendRedirect("/java_webapp_war/view.jsp?id=" + fileId + "&error=true");
                 }
             }
         }
@@ -104,13 +107,10 @@ public class FileDownloadServlet extends HttpServlet {
         } catch (Exception e) {
             if (e.getMessage().equals("unauthorized")) {
                 // Sahame na subor na ktory nemame prava
-                response.sendRedirect("files.jsp?error=unauthorized");
+                response.sendRedirect("/java_webapp_war/files.jsp?error=unauthorized");
                 return;
             }
-            File file = new File("test.log");
-            PrintStream ps = new PrintStream(file);
-            e.printStackTrace(ps);
-            response.sendRedirect("files.jsp?error=true");
+            response.sendRedirect("/java_webapp_war/files.jsp?error=true");
         }
         // Pokracujeme len ak sme dostali exception inu ako unauthorized, pravdepodobne
         // volame cez staru metodu downloads + nazov

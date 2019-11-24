@@ -50,10 +50,10 @@ public class KeysRegenerateServlet extends HttpServlet {
                 }
             } catch(Exception e) {}
 
-            resp.sendRedirect(req.getContextPath() + "/java_webapp_war/key_manager.jsp?error=0" );
+            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?error=0" );
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/java_webapp_war/key_manager.jsp?error=1" );
+            resp.sendRedirect(req.getContextPath() + "/key_manager.jsp?error=1" );
         }
     }
 
