@@ -16,9 +16,9 @@ public class FileDeleteServlet extends HttpServlet {
         HttpSession session = req.getSession();
 
 
-        String redirect = "/files.jsp";
+        String redirect = "/java_webapp_war/files.jsp";
         if (session == null || params == null || session.getAttribute("userId") == null) {
-            resp.sendRedirect("/login.jsp");
+            resp.sendRedirect("/java_webapp_war/login.jsp");
             return;
         }
 

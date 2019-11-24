@@ -20,7 +20,7 @@ public class FileDownloadServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String userId;
         if (session.getAttribute("userId") == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("/java_webapp_war/login.jsp");
             return;
         }
         else {

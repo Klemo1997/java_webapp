@@ -22,7 +22,7 @@ public class KeysRegenerateServlet extends HttpServlet {
 
         HttpSession session = req.getSession();
         if (session.getAttribute("userId") == null) {
-            resp.sendRedirect("/java_webapp_war/login.jsp");
+            resp.sendRedirect("/login.jsp");
             return;
         }
         String userId = session.getAttribute("userId").toString();
