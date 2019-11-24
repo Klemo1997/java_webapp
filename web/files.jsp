@@ -49,10 +49,17 @@
     );
 
     HashMap<String, Map<String, String>> uploadfiles = null;
-
+    HashMap<String, Integer> unacceptedRequestsCount = new HashMap<>();
     if (userId != null) {
         FileListManager flm = new FileListManager(userId);
         uploadfiles = flm.getUploads(filter);
+
+
+        for (String fileId : uploadfiles.keySet()) {
+            if (uploadfiles.get(fileId).get("owner_id").equals(userId)) {
+                unacceptedRequestsCount.put(fileId, PermissionHandler.getRequestsForFile(fileId, false) != null ? PermissionHandler.getRequestsForFile(fileId, false).size() : 0);
+            }
+        }
     }
 %>
 
@@ -166,6 +173,7 @@
                     <%  } %>
 
                     <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
+                    <span class="badge badge-info"><%= unacceptedRequestsCount != null && unacceptedRequestsCount.get(file_id) > 0 ? "Nové žiadosti : " + unacceptedRequestsCount.get(file_id) : "" %></span>
                     <form class="delete-file to-right" method="post" action="delete/<%= file_id %>">
                         <button type="submit" class="" title="Vymazať súbor"><i class="fas fa-trash-alt text-danger"></i></button>
                     </form>
