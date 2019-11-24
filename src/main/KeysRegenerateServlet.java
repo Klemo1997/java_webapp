@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class KeysRegenerateServlet extends HttpServlet {
 
@@ -43,7 +44,7 @@ public class KeysRegenerateServlet extends HttpServlet {
             FileListManager flm = new FileListManager(userId);
             try {
                 // Zmenili sme kluc, ulozime priznak o tom ze existujuce subory maju neaktualny kluc
-                HashMap<String, HashMap<String, String>> myFiles = flm.getCompleteInfo(filter);
+                HashMap<String, Map<String, String>> myFiles = flm.getUploads(filter);
                 for (String fileId : myFiles.keySet()) {
                     DbHandler db = new DbHandler();
                     db.setDeprecatedKey(fileId);

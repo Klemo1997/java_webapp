@@ -47,16 +47,17 @@
         } catch (SQLException | ClassNotFoundException e) {
             fileData = null;
         }
-        if (fileData == null) {
-            response.sendRedirect("/files.jsp?err=filenotfound");
-        }
     }
     ArrayList<HashMap<String, String>> unacceptedRequests = null;
-    assert fileData != null;
+
+    if (fileData == null || fileData.isEmpty()) {
+        response.sendRedirect("/files.jsp?err=filenotfound");
+        return;
+    }
+
     if (fileData.get("owner_id").equals(userId)) {
         unacceptedRequests = PermissionHandler.getRequestsForFile(fileId, false);
     }
-
 
     // Vytiahneme komentare
     ArrayList<HashMap<String,String>> comments = CommentsHandler.getCommentsByFile(fileId);
@@ -137,6 +138,9 @@
 
                 <% if (fileData.get("owner_id").equals(userId)) { %>
                     <a href="download/<%= fileId %>" class="btn btn-primary">Stiahnuť súbor</a>
+                    <form class="delete-file-hover" method="post" action="delete/<%= fileId %>" style="margin-bottom: 0; margin-top: 20px;">
+                        <button type="submit" class="btn btn-outline-danger" title="Vymazať súbor"><i class="fas fa-trash-alt"></i></button>
+                    </form>
                     <div class="permission-request-container mt-4" style="margin: auto; width: 200px;">
                         <% if (unacceptedRequests != null) { %>
                         <h4>Žiadosti o prístup</h4>
@@ -281,6 +285,13 @@
         $(this).fadeOut(400, function () {
             $(this).hide();
         });
+    });
+
+    $('.delete-file-hover').on('submit', function (e) {
+        if (!confirm('Chcete naozaj odstrániť tento súbor ?')) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
     });
 </script>
 </html>

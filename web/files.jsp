@@ -97,6 +97,9 @@
     <!-- /Navbar -->
 
     <div class="container filter text-center my-4">
+        <div class="alert alert-danger hidden error-flash" role="alert"></div>
+        <div class="alert alert-info hidden success-flash" role="alert"></div>
+
         <h3>Filtrovať:</h3>
 
         <form class="form" name="search_files" method="get" action="">
@@ -155,11 +158,18 @@
                         <small class="user-name-filelist text-danger">(Neaktuálny kľúč)</small>
                         <% } %>
                     </a>
+
                     <% if(PermissionHandler.canAccess(userId, file_id)) { %>
-                        <a href="download/<%=file_id%>" class="to-right" type="submit">
+                        <a href="download/<%=file_id%>" class="to-right" type="submit" title="Stiahnuť súbor">
                              <i class="fas fa-download"></i>
                         </a>
                     <%  } %>
+
+                    <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
+                    <form class="delete-file to-right" method="post" action="delete/<%= file_id %>">
+                        <button type="submit" class="" title="Vymazať súbor"><i class="fas fa-trash-alt text-danger"></i></button>
+                    </form>
+                    <% } %>
                 </li>
                 <% } %>
             <% } %>
@@ -202,6 +212,38 @@
            e.stopPropagation();
            alert('Váš vyhľadávací výraz je príliš dlhý');
        }
+    });
+
+    var url = new URL(window.location.href);
+
+    if (url.searchParams.get('err') === "1") {
+        $('.error-flash').text('Nastala neočakávaná chyba').show();
+    } else if (url.searchParams.get('err') === "filenotfound") {
+        $('.error-flash').text('Súbor sa nenašiel').show();
+    } else if (url.searchParams.get('err') === "deleteerror") {
+        $('.success-flash').text('Pri odstraňovaní súboru nastala chyba').show();
+    } else if (url.searchParams.get('success') === "deleted") {
+        $('.success-flash').text('Súbor bol odstránený').show();
+    }
+
+    $('.error-flash, .success-flash').on('click', function () {
+        $(this).fadeOut(400, function () {
+            $(this).hide();
+        });
+    });
+    $('.delete-file').hide();
+
+    $('.list-group-item').on('mouseenter', function(){
+        $(this).find('.delete-file').fadeIn(200, function () {});
+    }).on('mouseleave', function () {
+        $('.delete-file').hide();
+    });
+
+    $('.delete-file').on('submit', function (e) {
+        if (!confirm('Chcete naozaj odstrániť tento súbor ?')) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
     });
 </script>
 </body>

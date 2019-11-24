@@ -12,7 +12,7 @@ public class PermissionServ extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HashMap<String, String> params = parseUrlParams(req.getRequestURL().toString());
+        HashMap<String, String> params = parseUrlParams(req.getRequestURL().toString(), "permission");
         HttpSession session = req.getSession();
         String redirect = "";
 
@@ -46,7 +46,7 @@ public class PermissionServ extends HttpServlet {
 
 
     // Vyparsuje urlku v tvare permission/metoda/parameter/...
-    private HashMap<String, String> parseUrlParams(String url) {
+    static HashMap<String, String> parseUrlParams(String url, String rootparam) {
         String[] splitUrl = url.split("/");
         boolean startParams = false;
         int addedParams = 0;
@@ -55,7 +55,7 @@ public class PermissionServ extends HttpServlet {
         params = new HashMap<>();
         for (String s : splitUrl) {
 
-            if (startParams && addedParams > 0) {
+            if (startParams) {
                 // dalej zapisujeme dalsie parametre ktore pridu v url
                 if (addedParams > 0) {
                     params.put("param" + (addedParams - 1 == 0 ? "" : String.valueOf(addedParams - 1)), s);
@@ -68,7 +68,7 @@ public class PermissionServ extends HttpServlet {
                 }
             }
 
-            if (s.equals("permission")) {
+            if (s.equals(rootparam)) {
                 startParams = true;
             }
         }

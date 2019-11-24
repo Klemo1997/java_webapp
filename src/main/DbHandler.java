@@ -266,4 +266,15 @@ public class DbHandler {
         this.update("UPDATE files SET key_deprecated = ? WHERE id_file = ?", values);
     }
 
+    void deleteFile(String fileId) throws Exception {
+        //Pouzijeme na delete funkciu update, zbytocne duplikovat nemusime
+        ArrayList<String> fileIdVal = new ArrayList<>();
+        fileIdVal.add(fileId);
+        // Vymazeme z permissions
+        this.update("DELETE FROM permissions WHERE to_file_id = ?", fileIdVal);
+        // Vymazeme komentare
+        this.update("DELETE FROM comments WHERE file_id = ?", fileIdVal);
+        // Vymazeme file
+        this.update("DELETE FROM files WHERE id_file = ?", fileIdVal);
+    }
 }
