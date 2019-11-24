@@ -8,16 +8,86 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FileDownloadServlet extends HttpServlet {
+
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession();
+        String userId;
+        if (session.getAttribute("userId") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+        else {
+            userId = session.getAttribute("userId").toString();
+        }
+        Map<String, String> params = parseUrlParams(request.getRequestURL().toString());
+
+        //download/recrypt/3
+        assert params != null;
+        if (params.get("param").equals("recrypt")) {
+            String fileId = params.get("param1");
+            FileFilter  filter = new FileFilter(fileId);
+            FileListManager flm = new FileListManager(userId);
+            HashMap<String, String> fileData = null;
+
+            try {
+                fileData = flm.getCompleteInfo(filter).get(fileId);
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+
+                CryptoUtils crUtils = new CryptoUtils();
+                assert fileData != null;
+                File reencrypted = new File(crUtils.reEncrypt(fileData, userId));
+
+                byte[] buffer = new byte[4096];
+                int length;
+                OutputStream out = response.getOutputStream();
+                FileInputStream in = new FileInputStream(reencrypted);
+
+                response.setContentType("application/x-msdownload");
+                response.setHeader("Content-Disposition", "attachment; filename=" +  fileData.get("filename"));
+
+                while((length = in.read(buffer)) > 0)
+                {
+                    out.write(buffer, 0, length);
+                }
+                reencrypted.delete();
+                request.setAttribute("message","File Reencrypted Successfully");
+                out.flush();
+            } catch (Exception e) {
+                if (e.getMessage().equals("deprecated_private_key")) {
+                    // User ma neaktualny privateKey, ulozime to do tabulky, informujeme ho o tom vo flashi, subor si moze stiahnut znova priamo
+                    try {
+                        DbHandler db = new DbHandler();
+                        db.setDeprecatedKey(fileId);
+                    } catch (Exception ex) {
+                        response.sendRedirect("/view.jsp?id=" + fileId + "&error=true");
+                    }
+
+                    response.sendRedirect("/view.jsp?id=" + fileId + "&error=deprecatedprivatekey");
+                } else {
+                    response.sendRedirect("/view.jsp?id=" + fileId + "&error=true");
+                }
+            }
+        }
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         Map<String, String> params = parseUrlParams(request.getRequestURL().toString());
 
         try {
+            assert params != null;
             Integer.parseInt(params.get("param"));
             // Nastavime filter aby hladal file podla ID
             FileFilter filter = new FileFilter(FileFilter.ALL_MY_FILES);
@@ -40,6 +110,7 @@ public class FileDownloadServlet extends HttpServlet {
                 response.sendRedirect("files.jsp?error=unauthorized");
                 return;
             }
+            response.sendRedirect("/files.jsp?error=true");
         }
         // Pokracujeme len ak sme dostali exception inu ako unauthorized, pravdepodobne
         // volame cez staru metodu downloads + nazov
@@ -50,18 +121,18 @@ public class FileDownloadServlet extends HttpServlet {
         // Posledny prvok bude nas parameter pre file
         String filename = parsedUrl[parsedUrl.length - 1].split("\\?")[0];
 
-        downloadFile(filename, null, response, (String) session.getAttribute("userId"));
+        downloadFile(filename, response, (String) session.getAttribute("userId"));
     }
 
     /**
-     * Downloadneme zasifrofany subor
-     *
+     * Downloadneme zasifrovany subor
      * @param filename
      * @param response
+     * @param userId
      * @throws IOException
      */
-    private void downloadFile(String filename, String desiredName , HttpServletResponse response, String userId) throws IOException {
-        File toDownload = null;
+    private void downloadFile(String filename, HttpServletResponse response, String userId) throws IOException {
+        File toDownload;
 
         toDownload = new File(DirectoryManager.getUploadRoot(userId) + filename);
         if (!toDownload.exists()) {
@@ -78,12 +149,8 @@ public class FileDownloadServlet extends HttpServlet {
             out.write(buffer, 0, length);
         }
 
-        desiredName = desiredName == null
-                ? filename
-                : desiredName;
-
         response.setContentType("application/x-msdownload");
-        response.setHeader("Content-Disposition", "attachment; filename=" +  desiredName);
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
         in.close();
         out.flush();
@@ -127,16 +194,16 @@ public class FileDownloadServlet extends HttpServlet {
         int addedParams = 0;
 
 
-        HashMap<String, String> params = new HashMap<String, String>();
-        for (int i = 0; i < splitUrl.length; i++) {
+        HashMap<String, String> params = new HashMap<>();
+        for (String s : splitUrl) {
 
             if (startParams && addedParams >= 0) {
                 // dalej zapisujeme dalsie parametre ktore pridu v url
-                params.put("param" + (addedParams == 0 ? "" : String.valueOf(addedParams)), splitUrl[i]);
+                params.put("param" + (addedParams == 0 ? "" : String.valueOf(addedParams)), s);
                 addedParams++;
             }
 
-            if (splitUrl[i].equals("download")) {
+            if (s.equals("download")) {
                 params.put("method", "download");
                 startParams = true;
             }

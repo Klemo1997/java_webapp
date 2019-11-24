@@ -5,7 +5,7 @@
   Time: 19:00
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%
     if (session.getAttribute("userId") != null) {
         response.sendRedirect("index.jsp");
@@ -13,7 +13,7 @@
 %>
 <html>
 <head>
-    <meta http−equiv="Content−Type" content="text/html; charset=UTF−8">
+    <meta http-equiv="Content−Type" content="text/html; charset=UTF−8">
     <title>Prihlásiť sa</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="main.css">
@@ -51,7 +51,7 @@
         Váš účet bol vytvorený, teraz sa môžete prihlásiť
     </div>
 
-    <div class="form-box text-center" align="center">
+    <div class="form-box text-center">
         <h2 class="display-5 mb-4"> Prihlásenie </h2>
 
         <form name="login-data" action="login" method="post">
@@ -84,8 +84,7 @@
     if (url.searchParams.get('error') === "1") {
         $('.error-flash').show();
     } else if (url.searchParams.get('error') === "attemptsexceeded") {
-        $('.error-flash').text('Vyčerpali ste limit neúspešných pokusov o prihlásenie, skúste to znovu o 5 minút, prosím');
-        $('.error-flash').show();
+        $('.error-flash').text('Vyčerpali ste limit neúspešných pokusov o prihlásenie, skúste to znovu o 5 minút, prosím').show();
     }
 
     if (url.searchParams.get('registration') === 'success') {

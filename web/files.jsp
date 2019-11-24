@@ -1,9 +1,9 @@
 <%@ page import="main.FileFilter" %>
 <%@ page import="main.FileListManager" %>
+<%@ page import="main.PermissionHandler" %>
 <%@ page import="main.User" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="main.PermissionHandler" %>
 <%--
   Created by IntelliJ IDEA.
   User: matus
@@ -11,20 +11,16 @@
   Time: 16:15
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%
     //allow access only if session exists
-    String user = null;
-
     if (session.getAttribute("userId") == null) {
         response.sendRedirect("login.jsp");
-    } else {
-        user = (String) session.getAttribute("userId");
+        return;
     }
     String userName = null;
     String userId = null;
-    String sessionID = null;
 
     Cookie[] cookies = request.getCookies();
 
@@ -38,15 +34,11 @@
             if (cookie.getName().equals("userId")) {
                 userId = cookie.getValue();
             }
-
-            if (cookie.getName().equals("JSESSIONID")) {
-                sessionID = cookie.getValue();
-            }
         }
     }
 
     if (userName == null) {
-
+        response.sendRedirect("/logout");
     }
 
     FileFilter filter = new FileFilter(
@@ -146,7 +138,22 @@
                 <li class="list-group-item">
                     <a href="view.jsp?id=<%= file_id %>">
                         <%=uploadfiles.get(file_id).get("filename")%>
-                        <small class="user-name-filelist text-muted"><%= !uploadfiles.get(file_id).get("owner_id").equals(userId) ? "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" : "" %></small>
+                        <small class="user-name-filelist text-muted">
+                            <% try {
+                                if (!uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
+                                    <%= "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" %>
+                                <% }
+                            } catch (Exception e) { %>
+                                <%= "error" %>
+                            <%
+                            } %>
+                        </small>
+                        <% if (
+                           uploadfiles.get(file_id).get("owner_id").equals(userId) &&
+                           Integer.parseInt(uploadfiles.get(file_id).get("key_deprecated")) == 1
+                        ) { %>
+                        <small class="user-name-filelist text-danger">(Neaktuálny kľúč)</small>
+                        <% } %>
                     </a>
                     <% if(PermissionHandler.canAccess(userId, file_id)) { %>
                         <a href="download/<%=file_id%>" class="to-right" type="submit">
@@ -189,6 +196,13 @@
 
     $('input[name=file_query]').prop('readonly', !$('input[type=checkbox]').is(':checked'));
 
+    $('.search-file-btn').on('click', function (e) {
+       if ($('input[name=file_query]').val().length > 256) {
+           e.preventDefault();
+           e.stopPropagation();
+           alert('Váš vyhľadávací výraz je príliš dlhý');
+       }
+    });
 </script>
 </body>
 </html>

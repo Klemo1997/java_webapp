@@ -73,3 +73,16 @@ nav .container {
     border-bottom:1px dashed #efefef;
     margin-bottom:25px;
 }
+
+.info-div {
+    width: 350px;
+    margin: 10px auto;
+}
+
+.form-box {
+    margin: auto;
+    background-color: #e6e6e6;
+    width: 350px;
+
+    padding: 20px 20px 20px 20px;
+}

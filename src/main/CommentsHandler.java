@@ -24,7 +24,7 @@ public class CommentsHandler {
     }
 
     private static ArrayList<HashMap<String, String>> get(String queryString, ArrayList<String> values, String[] columns)
-            throws SQLException, ClassNotFoundException, Exception {
+            throws Exception {
         DbHandler db = new DbHandler();
 
         PreparedStatement query = db.connection.prepareStatement(queryString, Statement.RETURN_GENERATED_KEYS);
@@ -37,7 +37,7 @@ public class CommentsHandler {
         ArrayList<HashMap<String, String>> records = new ArrayList<>();
 
         while (rs.next()) {
-            HashMap<String, String> record = new HashMap<String, String>();
+            HashMap<String, String> record = new HashMap<>();
 
             for (String col : columns) {
                 if (rs.getString(col) == null) {
@@ -50,7 +50,7 @@ public class CommentsHandler {
         return records;
     }
 
-    public static boolean addComment(String commentBody, String userId, String fileId){
+    static boolean addComment(String commentBody, String userId, String fileId){
         ArrayList<String> values = new ArrayList<>();
         values.add(commentBody);
         values.add(userId);
@@ -65,7 +65,7 @@ public class CommentsHandler {
 
     public static ArrayList<HashMap<String, String>> getCommentsByFile(String fileId){
 
-        ArrayList<String> param = new ArrayList<String>();
+        ArrayList<String> param = new ArrayList<>();
         param.add(fileId);
         try {
             return get("SELECT * FROM comments WHERE file_id = ?", param, new String[]{"id_c", "body", "author_id", "file_id"});
