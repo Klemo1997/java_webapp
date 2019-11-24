@@ -109,7 +109,12 @@
         <servlet-name>PermissionsHandler</servlet-name>
         <url-pattern>/permission/*</url-pattern>
     </servlet-mapping>
-
-
-
+    <servlet>
+        <servlet-name>FileDeleteHandler</servlet-name>
+        <servlet-class>main.FileDeleteServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileDeleteHandler</servlet-name>
+        <url-pattern>/delete/*</url-pattern>
+    </servlet-mapping>
 </web-app>

@@ -110,7 +110,6 @@ public class FileDownloadServlet extends HttpServlet {
                 response.sendRedirect("/java_webapp_war/files.jsp?error=unauthorized");
                 return;
             }
-            response.sendRedirect("/java_webapp_war/files.jsp?error=true");
         }
         // Pokracujeme len ak sme dostali exception inu ako unauthorized, pravdepodobne
         // volame cez staru metodu downloads + nazov

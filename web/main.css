@@ -30,6 +30,11 @@
 .to-right {
     float: right;
 }
+
+form.to-right {
+    margin-bottom: 0;
+}
+
 .container {
     padding: 0;
     margin-top: 50px;
@@ -85,4 +90,8 @@ nav .container {
     width: 350px;
 
     padding: 20px 20px 20px 20px;
+}
+
+.delete-file button {
+    color: #cc1a22;
 }
