@@ -95,3 +95,7 @@ nav .container {
 .delete-file button {
     color: #cc1a22;
 }
+
+.file-download-link {
+    margin-right: 12px;
+}
