@@ -167,13 +167,21 @@
                     </a>
 
                     <% if(PermissionHandler.canAccess(userId, file_id)) { %>
-                        <a href="download/<%=file_id%>" class="to-right" type="submit" title="Stiahnuť súbor">
+
+                        <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
+                        <a href="download/<%= file_id %>" class="to-right file-download-link" type="submit" title="Stiahnuť súbor">
                              <i class="fas fa-download"></i>
                         </a>
-                    <%  } %>
+                        <%  } else { %>
+                        <form action="download/recrypt/<%= file_id %>" class="to-right" method="post" name="decrypt-download">
+                            <button type="submit" class="btn btn-outline-primary" title="Stiahnuť s prešifrovaním"><i class="fas fa-download"></i></button>
+                        </form>
+                        <%  }
+                        }
+                        %>
 
                     <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
-                    <span class="badge badge-info"><%= unacceptedRequestsCount != null && unacceptedRequestsCount.get(file_id) > 0 ? "Nové žiadosti : " + unacceptedRequestsCount.get(file_id) : "" %></span>
+                    <span class="badge badge-info"><%= unacceptedRequestsCount.get(file_id) > 0 ? "Nové žiadosti : " + unacceptedRequestsCount.get(file_id) : "" %></span>
                     <form class="delete-file to-right" method="post" action="delete/<%= file_id %>">
                         <button type="submit" class="" title="Vymazať súbor"><i class="fas fa-trash-alt text-danger"></i></button>
                     </form>
