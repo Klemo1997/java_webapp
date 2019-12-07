@@ -28,7 +28,7 @@ public class LoginServ extends HttpServlet {
             }
 
             if (!user.verify()) {
-                throw new Exception("Wrong data for login");
+                throw new Exception("verification_failed");
             }
 
 
@@ -46,7 +46,7 @@ public class LoginServ extends HttpServlet {
             response.addCookie(userName);
             response.addCookie(userId);
 
-            response.sendRedirect("index.jsp");
+            response.sendRedirect("index.jsp?success=loggedin");
 
         } catch (Exception e) {
             // Prekrocene pokusy o prihlasenie, odstavili sme usera na 5 minut
@@ -56,9 +56,19 @@ public class LoginServ extends HttpServlet {
                 }
                 response.sendRedirect("login.jsp?error=attemptsexceeded");
                 return;
+            } else if (e.getCause().toString().contains("ConnectException")) {
+                // Nenasla sa databaza, vyhodime error
+                response.sendRedirect("login.jsp?error=nodatabase");
+                return;
             }
-            session.setMaxInactiveInterval(5*60);
-            session.setAttribute("badLoginAttempt", ++badLoginCount);
+            // Zle prihlasovacie udaje
+            if (e.getMessage().equals("verification_failed")) {
+                session.setMaxInactiveInterval(5*60);
+                session.setAttribute("badLoginAttempt", ++badLoginCount);
+                response.sendRedirect("login.jsp?error=badlogin");
+                return;
+            }
+            // Ostatne errory
             response.sendRedirect("login.jsp?error=1");
         }
 
