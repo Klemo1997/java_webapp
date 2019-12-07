@@ -127,4 +127,14 @@
         <filter-name>CSRFFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <filter>
+        <filter-name>HeaderManageFilter</filter-name>
+        <filter-class>main.HeaderManageFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>HeaderManageFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 </web-app>
