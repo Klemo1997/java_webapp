@@ -59,16 +59,11 @@ public class RegistrationServlet extends HttpServlet {
             PrintStream ps = new PrintStream(file);
             e.printStackTrace(ps);
 
-            if (e.getCause().toString().contains("ConnectException")) {
+            if (e.getCause() != null && e.getCause().toString().contains("ConnectException")) {
                 errorType = "nodatabase";
             }
 
             response.sendRedirect("registration.jsp?error=" + errorType);
         }
     }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-
-    }
-
 }

@@ -88,8 +88,12 @@ nav .container {
     margin: auto;
     background-color: #e6e6e6;
     width: 350px;
-
     padding: 20px 20px 20px 20px;
+
+    /* Shadowing */
+    -webkit-box-shadow: 2px 2px 15px 1px rgba(0,0,0,0.61);
+    -moz-box-shadow: 2px 2px 15px 1px rgba(0,0,0,0.61);
+    box-shadow: 2px 2px 15px 1px rgba(0,0,0,0.61);
 }
 
 .delete-file button {
@@ -98,4 +102,22 @@ nav .container {
 
 .file-download-link {
     margin-right: 12px;
+}
+
+body {
+    background-image: url("assets/img/background1.jpg");
+    background-size: cover;
+}
+
+.media-list {
+    padding: 0 10px;
+}
+
+.media {
+    background-color: rgba(255, 255, 255, 0.55);
+    padding: 10px 12px;
+}
+
+.comment-separator {
+    margin: 3px 0 10px 0;
 }

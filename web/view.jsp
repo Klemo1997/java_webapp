@@ -245,6 +245,7 @@
                                     <li class="media">
                                         <div class="media-body">
                                             <strong class="text-success"><%= commentAuthor %></strong>
+                                            <hr class="comment-separator">
                                             <p>
                                                 <%= comment.get("body") %>
                                             </p>
