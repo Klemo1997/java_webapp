@@ -56,7 +56,7 @@ public class LoginServ extends HttpServlet {
                 }
                 response.sendRedirect("login.jsp?error=attemptsexceeded");
                 return;
-            } else if (e.getCause().toString().contains("ConnectException")) {
+            } else if (e.getCause() != null && e.getCause().toString().contains("ConnectException")) {
                 // Nenasla sa databaza, vyhodime error
                 response.sendRedirect("login.jsp?error=nodatabase");
                 return;
