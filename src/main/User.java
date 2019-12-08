@@ -24,6 +24,7 @@ public class User {
     private byte[] salt;
     private int id;
     private static final SecureRandom RANDOM = new SecureRandom();
+    private static int USERNAME_LENGTH_LIMIT = 32;
 
     public User()
     {
@@ -123,6 +124,11 @@ public class User {
 
     public void registerUser() throws SQLException, ClassNotFoundException, NoSuchAlgorithmException, InvalidKeySpecException {
         DbHandler db = new DbHandler();
+
+        if (this.userName.length() > USERNAME_LENGTH_LIMIT) {
+            throw new SQLException("username_too_long");
+        }
+
         String hashPasswd = hashPassword();
         PreparedStatement query = db.connection.prepareStatement("INSERT INTO users(Name,Password,Salt) values (?,?,?)", Statement.RETURN_GENERATED_KEYS);
         query.setString(1, this.userName);

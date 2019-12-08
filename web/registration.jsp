@@ -50,19 +50,19 @@
     <div class="form-box text-center">
         <h2 class="display-5 mb-4"> Registrácia </h2>
 
-        <form name="login-data" action="register" method="post">
+        <form name="login-data" class="user-data" action="register" method="post">
             <label class="custom-label" for="password">Prihlasovacie meno:</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Prihlasovacie meno" name="user_login" required>
+                <input type="text" class="form-control" placeholder="Prihlasovacie meno" name="user_login" minlength="4" maxlength="32" required>
             </div>
 
             <label class="custom-label" for="password">Zadajte heslo:</label>
             <div class="input-group mb-4">
-                <input type="password" id="password" class="form-control" placeholder="Heslo" name="user_password" required>
+                <input type="password" id="password" class="form-control" placeholder="Heslo" name="user_password" minlength="8" maxlength="40" required>
             </div>
             <label class="custom-label" for="password">Znova zadajte heslo:</label>
             <div class="input-group mb-4">
-                <input type="password" id="passwordcheck" class="form-control" placeholder="Heslo" name="user_password_check" required>
+                <input type="password" id="passwordcheck" class="form-control" placeholder="Heslo" name="user_password_check" minlength="8" maxlength="40" required>
             </div>
             <div class="input-group input-group-sm my-2">
                 <input type="submit" class="btn btn-primary btn-block" value="Vytvoriť">
@@ -99,6 +99,15 @@
         $(this).fadeOut(400, function () {
             $(this).hide();
         });
+    });
+
+    $('.user-data').on('submit', function (e) {
+        // Pridanie prazdneho komentara
+        if ($(this).find('input[type=text]').val().trim() === "") {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Nieje možné pridať prázdneho používateľské meno')
+        }
     });
 
 </script>

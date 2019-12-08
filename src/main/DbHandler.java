@@ -26,17 +26,20 @@ public class DbHandler {
         if (!file.exists() || this.connection.isClosed()){
             return;
         }
-        String name = file.getName();
+        String name = file.getName().length() < FileFilter.FILENAME_LENGTH_LIMIT
+                ? file.getName()
+                : file.getName().substring(0, FileFilter.FILENAME_LENGTH_LIMIT);
+
         String[] name_split = name.split("\\.");
         String path = file.getPath().replace('\\', '/');
-        String mimeType = Files.probeContentType(file.toPath()) != null
+        String mimeType = Files.probeContentType(file.toPath()) != null && Files.probeContentType(file.toPath()).length() < 8
                 ? Files.probeContentType(file.toPath())
                 : name_split[name_split.length - 2];
 
         PreparedStatement query = connection.prepareStatement("INSERT INTO files(filename, path, mime_type, owner_id) values (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
         query.setString(1, name);
         query.setString(2, path);
-        query.setString(3, mimeType.length() > 8 ? mimeType.substring(0, 8) : mimeType);
+        query.setString(3, mimeType);
         query.setInt(4, Integer.parseInt(uploadedBy));
         query.executeUpdate();
     }

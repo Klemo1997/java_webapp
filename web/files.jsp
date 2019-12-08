@@ -44,7 +44,7 @@
     FileFilter filter = new FileFilter(
             request.getParameter("search_by_names") != null && request.getParameter("search_by_names").equals("on"),
             request.getParameter("search_by_authors") != null && request.getParameter("search_by_authors").equals("on"),
-            request.getParameter("file_query"),
+            request.getParameter("file_query") != null ? request.getParameter("file_query") : "",
             request.getParameter("files_selector") != null && request.getParameter("files_selector").equals("allfiles")
     );
 
@@ -120,7 +120,7 @@
                 </select>
             </div>
             <div class="border border-primary my-3 p-5">
-            <input class="form-control mr-sm-2" type="search" placeholder="Vyhľadať..." aria-label="Search" name="file_query"
+            <input class="form-control mr-sm-2" type="search" placeholder="Vyhľadať..." aria-label="Search" name="file_query" maxlength="64"
                 <%= request.getParameter("file_query") != null ? "value='" + request.getParameter("file_query") + "'" : "" %> >
                     <small class="text-muted my-2"><i class="fas fa-info"></i> Pre vyhľadanie súborov podľa autora alebo názvu musí byť zaškrtnuté aspoň jedno políčko.</small>
                 <div class="custom-control custom-checkbox mr-sm-2">
@@ -137,13 +137,14 @@
         </form>
     </div>
 
-    <div class="container text-center mb-0"><small class="text-muted mt-2"><i class="fas fa-info"></i> V zátvorke pri cudzích súboroch sa nachádza meno vlastníka súboru </small></div>
+    <% if (uploadfiles.size() != 0) { %>
+        <div class="container text-center mb-0"><small class="text-muted mt-2"><i class="fas fa-info"></i> V zátvorke pri cudzích súboroch sa nachádza meno vlastníka súboru </small></div>
 
-    <div class="container text-center border border-primary mt-1">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
+        <div class="container text-center border border-primary mt-1">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
 
-            <% if (uploadfiles != null) { %>
+                <% if (uploadfiles != null) { %>
                 <% for (String file_id : uploadfiles.keySet()) { %>
                 <li class="list-group-item">
                     <a href="view.jsp?id=<%= file_id %>">
@@ -151,16 +152,16 @@
                         <small class="user-name-filelist text-muted">
                             <% try {
                                 if (!uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
-                                    <%= "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" %>
-                                <% }
+                            <%= "(" + User.getNameById(uploadfiles.get(file_id).get("owner_id")) + ")" %>
+                            <% }
                             } catch (Exception e) { %>
-                                <%= "error" %>
+                            <%= "error" %>
                             <%
-                            } %>
+                                } %>
                         </small>
                         <% if (
-                           uploadfiles.get(file_id).get("owner_id").equals(userId) &&
-                           Integer.parseInt(uploadfiles.get(file_id).get("key_deprecated")) == 1
+                                uploadfiles.get(file_id).get("owner_id").equals(userId) &&
+                                        Integer.parseInt(uploadfiles.get(file_id).get("key_deprecated")) == 1
                         ) { %>
                         <small class="user-name-filelist text-danger">(Neaktuálny kľúč)</small>
                         <% } %>
@@ -168,17 +169,17 @@
 
                     <% if(PermissionHandler.canAccess(userId, file_id)) { %>
 
-                        <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
-                        <a href="download/<%= file_id %>" class="to-right file-download-link" type="submit" title="Stiahnuť súbor">
-                             <i class="fas fa-download"></i>
-                        </a>
-                        <%  } else { %>
-                        <form action="download/recrypt/<%= file_id %>" class="to-right" method="post" name="decrypt-download">
-                            <button type="submit" class="btn btn-outline-primary" title="Stiahnuť s prešifrovaním"><i class="fas fa-download"></i></button>
-                        </form>
-                        <%  }
-                        }
-                        %>
+                    <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
+                    <a href="download/<%= file_id %>" class="to-right file-download-link" type="submit" title="Stiahnuť súbor">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <%  } else { %>
+                    <form action="download/recrypt/<%= file_id %>" class="to-right" method="post" name="decrypt-download">
+                        <button type="submit" class="btn btn-outline-primary" title="Stiahnuť s prešifrovaním"><i class="fas fa-download"></i></button>
+                    </form>
+                    <%  }
+                    }
+                    %>
 
                     <% if (uploadfiles.get(file_id).get("owner_id").equals(userId)) { %>
                     <span class="badge badge-info"><%= unacceptedRequestsCount.get(file_id) > 0 ? "Nové žiadosti : " + unacceptedRequestsCount.get(file_id) : "" %></span>
@@ -188,10 +189,17 @@
                     <% } %>
                 </li>
                 <% } %>
-            <% } %>
-        </ul>
-    </div>
+                <% } %>
+            </ul>
+        </div>
 
+    <% } else { %>
+        <div class="container text-center mb-0">
+            <p>
+                Momentálne nemáte na serveri žiadne súbory.
+            </p>
+        </div>
+    <% } %>
     <script src="assets/js/jquery-3.4.1.min.js"></script>
 <script src="assets/js/popper.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>

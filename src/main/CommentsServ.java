@@ -16,6 +16,12 @@ public class CommentsServ extends HttpServlet {
         HttpSession session = request.getSession();
         assert params != null;
         if (params.get("method").equals("add")) {
+            // Pokusili sme sa pridat prazdny komentar
+            if (request.getParameter("body").equals("")) {
+                response.sendRedirect("/view.jsp?id=" + params.get("param") + "&error=emptycomment");
+                return;
+            }
+
             if (
                 !CommentsHandler.addComment(
                     request.getParameter("body"),
@@ -24,6 +30,7 @@ public class CommentsServ extends HttpServlet {
                 )
             ) {
                 response.sendRedirect("/view.jsp?id=" + params.get("param") + "&error=comment");
+                return;
             }
             response.sendRedirect("/view.jsp?id=" + params.get("param") + "&success=comment");
         }
