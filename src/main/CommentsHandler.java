@@ -11,6 +11,8 @@ import java.util.HashMap;
 
 public class CommentsHandler {
 
+    public static final int COMMENT_LENGTH_LIMIT = 256;
+
     private static void add(String queryString, ArrayList<String> values) throws SQLException, ClassNotFoundException {
         DbHandler db = new DbHandler();
 
@@ -51,6 +53,11 @@ public class CommentsHandler {
     }
 
     static boolean addComment(String commentBody, String userId, String fileId){
+        // Komentar je dlhsi ako 256 znakov
+        if (commentBody.length() > COMMENT_LENGTH_LIMIT) {
+            return false;
+        }
+
         ArrayList<String> values = new ArrayList<>();
         values.add(commentBody);
         values.add(userId);

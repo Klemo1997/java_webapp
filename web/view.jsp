@@ -70,7 +70,7 @@
     <link href="assets/fontawesome/css/all.css" rel="stylesheet">
     <link rel="stylesheet" href="main.css">
 </head>
-<body>
+<body class="bg-cover">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container" style="margin: 0 auto;">
@@ -222,8 +222,8 @@
                             Panel komentárov
                         </div>
                         <div class="panel-body">
-                            <form method="post" name="add-comment" action="comments/add/<%= fileId %>">
-                                <textarea class="form-control" name="body" placeholder="Napíš komentár..." rows="3"></textarea>
+                            <form method="post" class="add-comment" name="add-comment" action="comments/add/<%= fileId %>">
+                                <textarea class="form-control" name="body" placeholder="Napíš komentár..." rows="3" maxlength="256"></textarea>
                                 <br>
                                 <button type="submit" class="btn btn-info" style="float: right;">Pridať komentár</button>
                             </form>
@@ -291,5 +291,15 @@
             e.stopPropagation();
         }
     });
+
+    $('.add-comment').on('submit', function (e) {
+        // Pridanie prazdneho komentara
+        if ($(this).find('textarea').val().trim() === "") {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Nieje možné pridať prázdny komentár')
+        }
+    });
+
 </script>
 </html>

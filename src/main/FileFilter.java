@@ -21,12 +21,19 @@ public class FileFilter {
     static final int ALL_MY_FILES = 1;
     // Vsetky subory
     private static final int ALL_FILES = 2;
+    private static final int QUERY_LENGTH_LIMIT = 64;
+    public static final int FILENAME_LENGTH_LIMIT = 64;
+
 
 
     public FileFilter(boolean search_file_names, boolean search_author_names, String query, boolean allFiles){
         this.searchFileNames = search_file_names;
         this.searchAuthorNames = search_author_names;
-        this.searchQuery = query;
+
+        this.searchQuery = query.length() < QUERY_LENGTH_LIMIT
+            ? query
+            : query.substring(0, QUERY_LENGTH_LIMIT);
+
         this.allFiles = allFiles;
         this.isDisabled = !search_file_names && !search_author_names && (query == null || query.equals(""));
     }

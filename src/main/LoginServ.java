@@ -36,12 +36,8 @@ public class LoginServ extends HttpServlet {
 
             //setting session to expiry in 10 mins
             session.setMaxInactiveInterval(10*60);
-
-            Cookie userName = new Cookie("user", user.getUserName());
-            Cookie userId   = new Cookie("userId", String.valueOf(user.getId()));
-
-            userName.setMaxAge(10*60);
-            userId.setMaxAge(10*60);
+            Cookie userName = new SecureCookie("user", user.getUserName(), 10*60, true);
+            Cookie userId   = new SecureCookie("userId", String.valueOf(user.getId()), 10 * 60, true);
 
             response.addCookie(userName);
             response.addCookie(userId);

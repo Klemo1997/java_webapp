@@ -106,6 +106,9 @@ nav .container {
 
 body {
     background-image: url("assets/img/background1.jpg");
+}
+
+body.bg-cover {
     background-size: cover;
 }
 

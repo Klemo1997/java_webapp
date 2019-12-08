@@ -87,28 +87,29 @@
     <div class="container text-center mt-5">
 
         <div class="text-center border-primary border p-5 regenerate-keys">
-            <h3> Pregenerovať kľúče </h3>
+            <h3><%= keysFiles.size() == 0 ? "Vygenerovať nové kľúče" : "Pregenerovať kľúče" %></h3>
 
             <form name="fm" action="keys_regenerate" method="post" id="regenerate-form" enctype="multipart/form-data">
                 <div class="input-group input-group-sm mt-3 mb-2" style="margin: auto">
-                    <input type="submit" class="btn btn-primary btn-block" value="Pregeneruj kľúče">
+                    <input type="submit" class="btn btn-primary btn-block" value="<%= keysFiles.size() == 0 ? "Vygeneruj nové kľúče" : "Pregeneruj kľúče" %>">
                 </div>
             </form>
         </div>
 
 
-        <div class="container text-center p-5">
-            <h3 class="mb-3"> Stiahni kľúče </h3>
-            <ul class="list-group list-group-flush border-primary border">
-                <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
-                <% if (keysFiles != null) {%>
-                    <% for (Map.Entry<String,String> entry : keysFiles.entrySet()) { %>
-                    <li class="list-group-item"><%=entry.getKey()%> <a class="to-right" href="download/<%=entry.getKey()%>"><i class="fas fa-download"></i></a></li>
-                    <% } %>
-                <% } %>
-
-            </ul>
-        </div>
+        <% if (keysFiles.size() != 0) { %>
+            <div class="container text-center p-5">
+                <h3 class="mb-3"> Stiahni kľúče </h3>
+                <ul class="list-group list-group-flush border-primary border">
+                    <li class="list-group-item list-group-item-action active">Zoznam dostupných súborov</li>
+                    <% if (keysFiles != null) {
+                         for (Map.Entry<String,String> entry : keysFiles.entrySet()) { %>
+                        <li class="list-group-item"><%=entry.getKey()%> <a class="to-right" href="download/<%=entry.getKey()%>"><i class="fas fa-download"></i></a></li>
+                        <% }
+                     } %>
+                </ul>
+            </div>
+        <% } %>
     </div>
 
     <script src="assets/js/jquery-3.4.1.min.js"></script>

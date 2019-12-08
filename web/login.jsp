@@ -56,12 +56,12 @@
         <form name="login-data" action="login" method="post">
             <label class="custom-label" for="password">Prihlasovacie meno:</label>
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Prihlasovacie meno" name="user_login" required>
+                <input type="text" class="form-control" placeholder="Prihlasovacie meno" name="user_login" minlength="4" maxlength="32" required>
             </div>
 
             <label class="custom-label" for="password">Zadajte heslo:</label>
             <div class="input-group mb-4">
-                <input type="password" id="password" class="form-control" placeholder="Heslo" name="user_password" required>
+                <input type="password" id="password" class="form-control" placeholder="Heslo" minlength="6" maxlength="40" name="user_password" required>
             </div>
 
             <div class="input-group input-group-sm my-2">
@@ -79,7 +79,7 @@
     var errorTexts = {
         badlogin         : "Prihlasovacie meno alebo heslo je nesprávne",
         attemptsexceeded : "Vyčerpali ste limit neúspešných pokusov o prihlásenie, skúste to znovu o 5 minút, prosím",
-        nodatabase       : "Databáza nebola nájdená, skontrolujte pripojenie.",
+        nodatabase       : "Databáza nebola nájdená, skontrolujte pripojenie."
     };
 
     var url = new URL(window.location.href);
