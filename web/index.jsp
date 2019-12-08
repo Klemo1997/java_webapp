@@ -33,13 +33,13 @@
 <!DOCTYPE HTML PUBLIC "−//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-    <meta http-equiv="Content−Type" content="text/html; charset=UTF−8">
-    <title>Nahraj súbor </title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://kit.fontawesome.com/fc14f2d665.js" crossorigin="anonymous" type="javascript"></script>
-    <link rel="stylesheet" href="main.css">
-</head>
+    <head>
+        <meta http-equiv="Content−Type" content="text/html; charset=UTF−8">
+        <title>Nahraj súbor </title>
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <link href="assets/fontawesome/css/all.css" rel="stylesheet">
+        <link rel="stylesheet" href="main.css">
+    </head>
 <body>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -80,6 +80,10 @@
         Pri dešifrovaní skontrolujte, či ste použili správny privátny kľúč
     </div>
 
+    <div class="alert alert-success hidden success-flash" role="alert">
+        Prihlásenie prebehlo úspešne
+    </div>
+
     <div class="form-box text-center" align="center">
         <h3> Vyber súbor </h3>
 
@@ -115,12 +119,9 @@
     </div>
 </div>
 
-<script
-        src="http://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-        crossorigin="anonymous" type="application/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous" type="application/javascript"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous" type="application/javascript"></script>
+<script src="assets/js/jquery-3.4.1.min.js"></script>
+<script src="assets/js/popper.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
 <script type="application/javascript">
     $('input[type=radio][name=cryption-type]').on('change', function () {
           var keyfilestr;
@@ -135,12 +136,20 @@
         $('#key_label').text(keyfilestr)
     });
 
-    var url = new URL(window.location.href);
-    if (url.searchParams.get('error') === "1") {
+    var url = new URL(window.location.href).searchParams;
+    if (url.get('error') === "1") {
         $('.error-flash').show();
+    } else if (url.get('success') === 'loggedin') {
+        $('.success-flash').show();
     }
 
     $('.error-flash').on('click', function () {
+        $(this).fadeOut(400, function () {
+            $(this).hide();
+        });
+    });
+
+    $('.success-flash').on('click', function () {
         $(this).fadeOut(400, function () {
             $(this).hide();
         });
