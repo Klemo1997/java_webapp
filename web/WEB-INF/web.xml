@@ -137,4 +137,10 @@
         <filter-name>HeaderManageFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <error-page>
+        <!-- Missing resource -->
+        <error-code>404</error-code>
+        <location>/error404.html</location>
+    </error-page>
 </web-app>

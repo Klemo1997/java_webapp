@@ -121,3 +121,11 @@ body {
 .comment-separator {
     margin: 3px 0 10px 0;
 }
+
+.error-describe {
+    font-size: 18px;
+}
+
+.content {
+    background-color: rgba(233,236,239,0.3);
+}
